@@ -1,0 +1,5 @@
+supplier_id,name,country,category,tier,reliability_score,on_time_delivery_rate,average_lead_time_days,delay_incidents_last_90d,status,contact_email
+SUP-APX-01,Apex Micro Devices Inc.,Taiwan,Microcontrollers & ASICs,Tier 1,78,79.5,16,4,conditional,ops@apex-microdevices.fake
+SUP-KYT-02,Kyoto Advanced Substrates,Japan,Compute Accelerators & Packaging,Tier 1,94,94.2,12,1,preferred,supply-chain@kyoto-substrates.fake
+SUP-BAV-03,Bavaria Sensorik GmbH,Germany,Industrial Optics & Transducers,Tier 1,98,97.5,5,0,preferred,fulfillment@bavaria-sensorik.fake
+SUP-VEX-04,Vextron Semiconductor Ltd,South Korea,Microcontrollers & Networking Modules,Tier 2,88,89.0,9,2,preferred,emergency-orders@vextron-semi.fake

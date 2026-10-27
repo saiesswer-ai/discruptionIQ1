@@ -1,0 +1,4 @@
+warehouse_id,name,location,city,country,total_capacity_sqm,available_dock_doors,status
+WH-RTM-01,Rotterdam Central Hub,Maasvlakte Logistics Park,Rotterdam,Netherlands,45000,16,active
+WH-FRA-01,Frankfurt Air Cargo Center,CargoCity South Gateway 3,Frankfurt,Germany,28000,12,active
+WH-ORD-01,Chicago Central Depot,O'Hare Logistics Corridor,Chicago,United States,52000,20,active

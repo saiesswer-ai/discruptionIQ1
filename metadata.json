@@ -1,0 +1,6 @@
+{
+  "name": "DisruptionIQ — Recovery Arena",
+  "description": "Enterprise supply chain disruption management platform for detecting delays, ranking order risk, comparing recovery plans, and simulating recovery workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

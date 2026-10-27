@@ -1,0 +1,13 @@
+shipment_id,tracking_number,carrier_name,transport_mode,origin,destination,status,delay_hours,supplier_id,supplier_name,cargo_description,promised_delivery_date,estimated_delivery_date,affected_orders_count
+SHP-99214,MSKU-781920-4,Maersk Line,Ocean,Port of Yokohama,Rotterdam Maasvlakte,delayed,48,SUP-KYT-02,Kyoto Advanced Substrates,800x NVX-9400 Accelerator Units,2026-10-26T06:00:00Z,2026-10-28T06:00:00Z,5
+SHP-99215,MSKU-781921-9,Maersk Line,Ocean,Port of Kaohsiung,Rotterdam Maasvlakte,delayed,48,SUP-APX-01,Apex Micro Devices Inc.,600x ETH-200X Networking Cards,2026-10-26T08:00:00Z,2026-10-28T08:00:00Z,4
+SHP-99216,LH-CARGO-4412,Lufthansa Cargo,Air,Frankfurt CargoCity,Chicago O'Hare ORD,on_schedule,0,SUP-BAV-03,Bavaria Sensorik GmbH,300x OPT-5000 Transceiver Units,2026-10-27T16:00:00Z,2026-10-27T16:00:00Z,0
+SHP-99217,DHL-EX-00918,DHL Freight,Road,Munich Logistics Park,Rotterdam Central Hub,on_schedule,0,SUP-BAV-03,Bavaria Sensorik GmbH,400x PWR-4500 Power Units,2026-10-27T08:00:00Z,2026-10-27T08:00:00Z,0
+SHP-99218,FDX-PRI-3310,FedEx Priority,Air,Taipei Taoyuan TPE,Chicago O'Hare ORD,customs_hold,24,SUP-APX-01,Apex Micro Devices Inc.,250x MCU-8800 Pilot MCUs,2026-10-26T14:00:00Z,2026-10-27T14:00:00Z,2
+SHP-99219,KAL-CARGO-802,Korean Air Cargo,Air,Seoul Incheon ICN,Frankfurt FRA Hub,on_schedule,0,SUP-VEX-04,Vextron Semiconductor Ltd,500x ETH-200X NICs,2026-10-27T12:00:00Z,2026-10-27T12:00:00Z,0
+SHP-99220,ONE-EXP-5591,Ocean Network Express,Ocean,Port of Kaohsiung,Chicago Hub via LAX,delayed,72,SUP-APX-01,Apex Micro Devices Inc.,1200x MCU-8800 Microcontrollers,2026-10-27T10:00:00Z,2026-10-30T10:00:00Z,4
+SHP-99221,NCA-AIR-7711,Nippon Cargo Airlines,Air,Tokyo Narita NRT,Frankfurt CargoCity,on_schedule,0,SUP-KYT-02,Kyoto Advanced Substrates,350x NVX-9400 Substrates,2026-10-28T04:00:00Z,2026-10-28T04:00:00Z,0
+SHP-99222,DBS-ROAD-119,DB Schenker,Road,Stuttgart Hub,Frankfurt CargoCity,delivered,0,SUP-BAV-03,Bavaria Sensorik GmbH,600x CAB-HD12 Fiber Looms,2026-10-26T10:00:00Z,2026-10-26T09:30:00Z,0
+SHP-99223,AAR-CARGO-404,Asiana Cargo,Air,Seoul Incheon ICN,Chicago O'Hare ORD,on_schedule,0,SUP-VEX-04,Vextron Semiconductor Ltd,400x MEM-64GB Server Kits,2026-10-28T18:00:00Z,2026-10-28T18:00:00Z,0
+SHP-99224,DHL-EXP-7702,DHL Express,Road,Nuremberg Tech Center,Rotterdam Central Hub,on_schedule,0,SUP-BAV-03,Bavaria Sensorik GmbH,500x FAN-9000 Cooling Blocks,2026-10-27T14:00:00Z,2026-10-27T14:00:00Z,0
+SHP-99225,HAP-SEA-9901,Hapag-Lloyd,Ocean,Port of Busan,Rotterdam Maasvlakte,delayed,24,SUP-VEX-04,Vextron Semiconductor Ltd,300x ETH-200X Network Modules,2026-10-28T10:00:00Z,2026-10-29T10:00:00Z,1

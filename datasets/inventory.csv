@@ -1,0 +1,25 @@
+inventory_id,warehouse_id,warehouse_name,sku,sku_description,category,on_hand_units,available_units,reserved_units,inbound_units,safety_stock_threshold,unit_cost_usd,status,last_audited_at
+INV-001,WH-RTM-01,Rotterdam Central Hub,NVX-9400,Server Accelerator Board,Compute Accelerators,520,70,450,800,200,850.00,critical,2026-10-25T14:00:00Z
+INV-002,WH-RTM-01,Rotterdam Central Hub,ETH-200X,Dual-Port 100GbE NIC,Networking Modules,720,120,600,600,250,320.00,critical,2026-10-25T14:00:00Z
+INV-003,WH-RTM-01,Rotterdam Central Hub,MCU-8800,Automotive Embedded MCU,Microcontrollers,220,60,160,0,80,140.00,constrained,2026-10-25T16:00:00Z
+INV-004,WH-RTM-01,Rotterdam Central Hub,PWR-4500,Redundant 3kW Power Module,Power Systems,350,200,150,400,120,210.00,healthy,2026-10-25T18:00:00Z
+INV-005,WH-RTM-01,Rotterdam Central Hub,OPT-5000,High-Speed Optical Transceiver,Optics & Transducers,180,100,80,0,60,460.00,healthy,2026-10-25T20:00:00Z
+INV-006,WH-RTM-01,Rotterdam Central Hub,CAB-HD12,High-Density Fiber Loom,Interconnects,450,300,150,0,150,75.00,healthy,2026-10-25T22:00:00Z
+INV-007,WH-RTM-01,Rotterdam Central Hub,MEM-64GB,ECC DDR5 Server Memory Kit,Memory Modules,320,180,140,0,100,180.00,healthy,2026-10-26T00:00:00Z
+INV-008,WH-RTM-01,Rotterdam Central Hub,FAN-9000,Liquid Cooling Chilled Block,Thermal Solutions,280,180,100,500,90,125.00,healthy,2026-10-26T02:00:00Z
+INV-009,WH-FRA-01,Frankfurt Air Cargo Center,NVX-9400,Server Accelerator Board,Compute Accelerators,530,410,120,350,150,850.00,healthy,2026-10-26T00:30:00Z
+INV-010,WH-FRA-01,Frankfurt Air Cargo Center,ETH-200X,Dual-Port 100GbE NIC,Networking Modules,480,380,100,500,120,320.00,healthy,2026-10-26T00:30:00Z
+INV-011,WH-FRA-01,Frankfurt Air Cargo Center,MCU-8800,Automotive Embedded MCU,Microcontrollers,140,80,60,0,60,140.00,healthy,2026-10-25T21:00:00Z
+INV-012,WH-FRA-01,Frankfurt Air Cargo Center,PWR-4500,Redundant 3kW Power Module,Power Systems,260,180,80,0,100,210.00,healthy,2026-10-25T21:00:00Z
+INV-013,WH-FRA-01,Frankfurt Air Cargo Center,OPT-5000,High-Speed Optical Transceiver,Optics & Transducers,320,230,90,0,80,460.00,healthy,2026-10-25T23:00:00Z
+INV-014,WH-FRA-01,Frankfurt Air Cargo Center,CAB-HD12,High-Density Fiber Loom,Interconnects,800,600,200,600,200,75.00,healthy,2026-10-26T01:00:00Z
+INV-015,WH-FRA-01,Frankfurt Air Cargo Center,MEM-64GB,ECC DDR5 Server Memory Kit,Memory Modules,290,220,70,0,90,180.00,healthy,2026-10-26T01:30:00Z
+INV-016,WH-FRA-01,Frankfurt Air Cargo Center,FAN-9000,Liquid Cooling Chilled Block,Thermal Solutions,220,170,50,0,70,125.00,healthy,2026-10-26T03:00:00Z
+INV-017,WH-ORD-01,Chicago Central Depot,NVX-9400,Server Accelerator Board,Compute Accelerators,190,110,80,0,80,850.00,healthy,2026-10-25T21:00:00Z
+INV-018,WH-ORD-01,Chicago Central Depot,ETH-200X,Dual-Port 100GbE NIC,Networking Modules,210,120,90,0,90,320.00,healthy,2026-10-25T21:00:00Z
+INV-019,WH-ORD-01,Chicago Central Depot,MCU-8800,Automotive Embedded MCU,Microcontrollers,400,50,350,1200,300,140.00,critical,2026-10-25T21:00:00Z
+INV-020,WH-ORD-01,Chicago Central Depot,PWR-4500,Redundant 3kW Power Module,Power Systems,310,110,200,0,150,210.00,constrained,2026-10-25T22:00:00Z
+INV-021,WH-ORD-01,Chicago Central Depot,OPT-5000,High-Speed Optical Transceiver,Optics & Transducers,150,90,60,300,70,460.00,healthy,2026-10-25T22:30:00Z
+INV-022,WH-ORD-01,Chicago Central Depot,CAB-HD12,High-Density Fiber Loom,Interconnects,380,260,120,0,120,75.00,healthy,2026-10-26T00:00:00Z
+INV-023,WH-ORD-01,Chicago Central Depot,MEM-64GB,ECC DDR5 Server Memory Kit,Memory Modules,240,130,110,400,80,180.00,healthy,2026-10-26T02:00:00Z
+INV-024,WH-ORD-01,Chicago Central Depot,FAN-9000,Liquid Cooling Chilled Block,Thermal Solutions,190,120,70,0,60,125.00,healthy,2026-10-26T03:30:00Z
