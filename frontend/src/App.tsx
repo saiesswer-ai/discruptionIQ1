@@ -23,7 +23,7 @@ import { AuditTrailPage } from './pages/AuditTrailPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 const MainContent: React.FC = () => {
-  const { activePage, authState, dataState, dataError, refreshData } = useApp();
+  const { activePage, authState, dataState, isInitialLoad, dataError, refreshData } = useApp();
 
   if (authState !== 'authenticated') return <AuthGate />;
 
@@ -59,8 +59,10 @@ const MainContent: React.FC = () => {
       <TopNavbar />
       <main className="flex-1 overflow-y-auto p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
-          {dataState === 'loading' && <div className="mb-4 text-xs text-sky-300 bg-sky-950/40 border border-sky-900 rounded p-3">Loading live operational data…</div>}
-          {dataState === 'error' && <div className="mb-4 flex items-center justify-between gap-3 text-xs text-rose-200 bg-rose-950/40 border border-rose-800 rounded p-3"><span>{dataError}</span><button onClick={refreshData} className="px-2 py-1 rounded bg-rose-900 hover:bg-rose-800">Retry</button></div>}
+          {/* Only show the loading banner on the very first fetch, not on
+              subsequent background refreshes triggered by user actions. */}
+          {dataState === 'loading' && isInitialLoad && <div className="mb-4 text-xs text-sky-300 bg-sky-950/40 border border-sky-900 rounded p-3">Loading live operational data…</div>}
+          {dataState === 'error' && <div className="mb-4 flex items-center justify-between gap-3 text-xs text-rose-200 bg-rose-950/40 border border-rose-800 rounded p-3"><span>{dataError}</span><button onClick={() => refreshData()} className="px-2 py-1 rounded bg-rose-900 hover:bg-rose-800">Retry</button></div>}
           {dataState === 'empty' && <div className="mb-4 text-xs text-slate-300 bg-slate-900 border border-slate-800 rounded p-3">The API returned no operational records.</div>}
           {renderActivePage()}
         </div>

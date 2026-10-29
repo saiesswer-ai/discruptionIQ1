@@ -14,3 +14,13 @@ class Supplier(BaseModel):
     delayIncidentsLast90d: int
     status: str  # preferred, conditional, restricted
     contactEmail: str
+
+
+class SupplierIssueCreate(BaseModel):
+    supplierId: str
+    issueType: str  # quality_hold, capacity_reduction, raw_material_shortage, facility_outage, lead_time_increase
+    title: str
+    description: str
+    severity: str = "medium"  # critical, high, medium, low
+    estimatedDelayDays: int = 0
+    reason: str = "Manual supplier issue report"

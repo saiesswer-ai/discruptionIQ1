@@ -66,6 +66,181 @@ def development_accounts() -> list[dict[str, object]]:
     ]
 
 
+def canonical_disruptions() -> list[dict[str, object]]:
+    """Return the baseline disruption scenarios defined in datasets/README.md and API_CONTRACT.md."""
+    return [
+        {
+            "id": "DIS-2026-0891",
+            "title": "Vessel Maersk Antwerpen Berth Hold (48h Sea Freight Delay)",
+            "severity": "critical",
+            "status": "active",
+            "detected_at": parse_datetime("2026-10-26T02:15:00Z"),
+            "source_key": "canonical:DIS-2026-0891",
+            "payload": {
+                "type": "carrier_delay",
+                "typeLabel": "Carrier Sea Freight Delay",
+                "delayHours": 48,
+                "location": "North Sea Approach / Port of Rotterdam Outer Anchorage",
+                "carrierOrSupplier": "Maersk Line / North Sea Terminal",
+                "estimatedFinancialImpactUSD": 384000,
+                "summary": "Main propulsion auxiliary pump malfunction followed by container berth berthage rescheduling at Rotterdam Maasvlakte Terminal. Current anchor delay estimated at 48 hours.",
+                "rootCause": "Mechanical failure at sea anchor point followed by port pilotage window forfeiture.",
+                "affectedOrderCount": 8,
+                "affectedSKUs": ["NVX-9400", "ETH-200X"],
+                "linkedShipmentIds": ["SHP-99214", "SHP-99215"],
+                "linkedWarehouseIds": ["WH-RTM-01"],
+                "eventPayload": {
+                    "vesselIMO": "9834211",
+                    "vesselName": "Maersk Antwerpen",
+                    "voyageNumber": "2641-W",
+                    "originalETA": "2026-10-26T06:00:00Z",
+                    "revisedETA": "2026-10-28T06:00:00Z",
+                    "berthCode": "MSV-2",
+                    "containerCountManifested": 420,
+                    "impactedTEUs": 6,
+                    "telemetrySource": "AIS Satellite Inbound Feed v4.2",
+                },
+                "timeline": [
+                    {
+                        "id": "ev-1",
+                        "timestamp": "2026-10-26T01:30:00Z",
+                        "title": "AIS Telemetry Speed Drop Detected",
+                        "description": "Vessel speed dropped from 18.2 kts to 2.4 kts near Hook of Holland fairway.",
+                        "source": "AIS Satellite Feed",
+                    },
+                    {
+                        "id": "ev-2",
+                        "timestamp": "2026-10-26T02:15:00Z",
+                        "title": "Carrier EDI 315 Delay Notification Received",
+                        "description": "Maersk operations confirmed mechanical stand-down and berth loss. Projected 48-hour delay.",
+                        "source": "Carrier EDI Gateway",
+                    },
+                    {
+                        "id": "ev-3",
+                        "timestamp": "2026-10-26T03:00:00Z",
+                        "title": "DisruptionIQ Impact Engine Linked 8 Enterprise Orders",
+                        "description": "Auto-correlated manifest containers against inventory reservation demands in Rotterdam Central Hub.",
+                        "source": "DisruptionIQ Core",
+                    },
+                ],
+            },
+            "impacts": [
+                ("shipment", "SHP-99214", {"kind": "delayed_shipment", "facts": {"delayHours": 48}}),
+                ("shipment", "SHP-99215", {"kind": "delayed_shipment", "facts": {"delayHours": 48}}),
+                ("warehouse", "WH-RTM-01", {"kind": "affected_hub", "facts": {"hubCode": "WH-RTM-01"}}),
+                ("sku", "NVX-9400", {"kind": "affected_sku", "facts": {"sku": "NVX-9400"}}),
+                ("sku", "ETH-200X", {"kind": "affected_sku", "facts": {"sku": "ETH-200X"}}),
+                ("order", "ORD-8401", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 98}}),
+                ("order", "ORD-8402", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 95}}),
+                ("order", "ORD-8403", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 90}}),
+                ("order", "ORD-8404", {"kind": "at_risk_order", "facts": {"priority": "P2", "riskScore": 82}}),
+                ("order", "ORD-8405", {"kind": "at_risk_order", "facts": {"priority": "P2", "riskScore": 76}}),
+                ("order", "ORD-8406", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 96}}),
+                ("order", "ORD-8407", {"kind": "at_risk_order", "facts": {"priority": "P2", "riskScore": 68}}),
+                ("order", "ORD-8408", {"kind": "at_risk_order", "facts": {"priority": "P3", "riskScore": 42}}),
+            ],
+        },
+        {
+            "id": "DIS-2026-0894",
+            "title": "Micro-Controller Batch Hold at Kaohsiung Fab 4",
+            "severity": "high",
+            "status": "active",
+            "detected_at": parse_datetime("2026-10-25T18:40:00Z"),
+            "source_key": "canonical:DIS-2026-0894",
+            "payload": {
+                "type": "supplier_delay",
+                "typeLabel": "Supplier Quality Hold & Delay",
+                "delayHours": 72,
+                "location": "Kaohsiung Science Park, Taiwan",
+                "carrierOrSupplier": "Apex Micro Devices Inc.",
+                "estimatedFinancialImpactUSD": 218000,
+                "summary": "Wafer batch thermal deviation in cleanroom line 3 triggered automated QA quarantine on lot LOT-2026-KHS-994.",
+                "rootCause": "Thermal cycle excursion on diffusion furnace tube B4 during qualification run.",
+                "affectedOrderCount": 6,
+                "affectedSKUs": ["MCU-8800"],
+                "linkedShipmentIds": ["SHP-99220"],
+                "linkedWarehouseIds": ["WH-ORD-01"],
+                "eventPayload": {
+                    "fabLocation": "Kaohsiung Fab 4",
+                    "quarantineLotId": "LOT-2026-KHS-994",
+                    "originalDispatchDate": "2026-10-25T12:00:00Z",
+                    "revisedDispatchDate": "2026-10-28T12:00:00Z",
+                },
+                "timeline": [
+                    {
+                        "id": "ev-10",
+                        "timestamp": "2026-10-25T17:15:00Z",
+                        "title": "Cleanroom Furnace Temperature Alarm",
+                        "description": "Temperature variation excursion flagged on Diffusion Furnace B4.",
+                        "source": "Apex MES Telemetry",
+                    },
+                    {
+                        "id": "ev-11",
+                        "timestamp": "2026-10-25T18:40:00Z",
+                        "title": "QA Quarantine Enacted",
+                        "description": "Apex quality team locked lot LOT-2026-KHS-994 for 72h destructive slice analysis.",
+                        "source": "Supplier Portal",
+                    },
+                ],
+            },
+            "impacts": [
+                ("shipment", "SHP-99220", {"kind": "delayed_shipment", "facts": {"delayHours": 72}}),
+                ("warehouse", "WH-ORD-01", {"kind": "affected_hub", "facts": {"hubCode": "WH-ORD-01"}}),
+                ("sku", "MCU-8800", {"kind": "affected_sku", "facts": {"sku": "MCU-8800"}}),
+                ("order", "ORD-8409", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 94}}),
+                ("order", "ORD-8410", {"kind": "at_risk_order", "facts": {"priority": "P2", "riskScore": 80}}),
+                ("order", "ORD-8411", {"kind": "at_risk_order", "facts": {"priority": "P1", "riskScore": 88}}),
+                ("order", "ORD-8412", {"kind": "at_risk_order", "facts": {"priority": "P2", "riskScore": 70}}),
+                ("order", "ORD-8413", {"kind": "at_risk_order", "facts": {"priority": "P3", "riskScore": 52}}),
+                ("order", "ORD-8414", {"kind": "at_risk_order", "facts": {"priority": "P3", "riskScore": 35}}),
+            ],
+        },
+    ]
+
+
+def provision_canonical_disruptions(db: Session | None = None) -> dict[str, int]:
+    """Insert missing canonical disruption records without altering any existing data."""
+    database.init_database()
+    close_session = db is None
+    if db is None:
+        db = database.SessionLocal()
+
+    created = 0
+    try:
+        import json
+        for dis in canonical_disruptions():
+            existing = db.scalar(select(DisruptionRecord).where(DisruptionRecord.id == dis["id"]))
+            if existing:
+                continue
+            record = DisruptionRecord(
+                id=str(dis["id"]),
+                title=str(dis["title"]),
+                severity=str(dis["severity"]),
+                status=str(dis["status"]),
+                detected_at=dis["detected_at"],  # type: ignore[arg-type]
+                source_key=str(dis["source_key"]),
+                payload_json=json.dumps(dis["payload"]),
+            )
+            db.add(record)
+            db.flush()
+            for entity_type, entity_id, evidence in dis["impacts"]:  # type: ignore[union-attr]
+                db.add(DisruptionImpact(
+                    disruption_id=str(dis["id"]),
+                    entity_type=str(entity_type),
+                    entity_id=str(entity_id),
+                    evidence_json=json.dumps(evidence),
+                ))
+            created += 1
+        db.commit()
+        return {"created": created, "existing": len(canonical_disruptions()) - created}
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        if close_session:
+            db.close()
+
+
 def provision_development_users(db: Session | None = None) -> dict[str, int]:
     """Insert missing established development accounts without altering any existing data."""
     database.init_database()
@@ -355,6 +530,10 @@ def seed_database(db: Session | None = None) -> dict[str, int]:
         db.flush()
         counts["users"] = len(dev_accounts)
 
+        # 9. Seed Canonical Disruption Scenarios (Scenario 1 & Scenario 2)
+        dis_results = provision_canonical_disruptions(db)
+        counts["disruptions"] = dis_results["created"] + dis_results["existing"]
+
         db.commit()
         return counts
 
@@ -373,11 +552,19 @@ def main() -> None:
         action="store_true",
         help="Add only missing established development accounts; preserve all operational records.",
     )
+    parser.add_argument(
+        "--disruptions-only",
+        action="store_true",
+        help="Add only missing baseline canonical disruptions; preserve all existing operational records.",
+    )
     args = parser.parse_args()
     print(f"Database Target: {database.engine.url}")
     if args.users_only:
         counts = provision_development_users()
         print("\n[OK] Development user provisioning complete:")
+    elif args.disruptions_only:
+        counts = provision_canonical_disruptions()
+        print("\n[OK] Canonical disruptions provisioning complete:")
     else:
         print(f"Loading synthetic datasets from: {DATASETS_DIR}")
         counts = seed_database()

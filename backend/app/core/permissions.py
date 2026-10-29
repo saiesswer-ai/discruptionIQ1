@@ -34,6 +34,13 @@ class Permission(str, Enum):
     AI_ADVISE = "ai:advise"
     AI_REPORT = "ai:report"
 
+    # Operational Manual Data Entry & Management
+    DISRUPTIONS_WRITE = "disruptions:write"
+    INVENTORY_WRITE = "inventory:write"
+    SHIPMENTS_WRITE = "shipments:write"
+    SUPPLIERS_WRITE = "suppliers:write"
+    ORDERS_WRITE = "orders:write"
+
     # Administrative
     ADMIN_ALL = "admin:all"
 
@@ -85,6 +92,10 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.AI_ANALYZE,
         Permission.AI_ADVISE,
         Permission.AI_REPORT,
+        Permission.DISRUPTIONS_WRITE,
+        Permission.SHIPMENTS_WRITE,
+        Permission.SUPPLIERS_WRITE,
+        Permission.ORDERS_WRITE,
     },
     UserRole.WAREHOUSE_OPERATOR.value: {
         Permission.DASHBOARD_READ,
@@ -94,6 +105,7 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.SHIPMENTS_READ,
         Permission.PLANS_READ,
         Permission.PLANS_EXECUTE,  # Warehouse operators can execute approved warehouse picks
+        Permission.INVENTORY_WRITE,
     },
     UserRole.SUPPLY_CHAIN_MANAGER.value: {
         Permission.DASHBOARD_READ,
@@ -115,6 +127,11 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.AI_ANALYZE,
         Permission.AI_ADVISE,
         Permission.AI_REPORT,
+        Permission.DISRUPTIONS_WRITE,
+        Permission.INVENTORY_WRITE,
+        Permission.SHIPMENTS_WRITE,
+        Permission.SUPPLIERS_WRITE,
+        Permission.ORDERS_WRITE,
     },
     UserRole.PROCUREMENT_APPROVER.value: {
         Permission.DASHBOARD_READ,
@@ -131,6 +148,7 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.PLANS_REJECT,
         Permission.AI_ADVISE,
         Permission.AI_REPORT,
+        Permission.SUPPLIERS_WRITE,
     },
     UserRole.ADMINISTRATOR.value: set(Permission),  # Administrators hold all permissions
 }

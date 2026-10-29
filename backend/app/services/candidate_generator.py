@@ -27,6 +27,7 @@ from typing import Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.governance import DisruptionImpact
 from app.models.supply_chain import Inventory, Order, OrderLine, Shipment, Supplier
 from app.services.fairshare_allocator import (
     AllocationCandidate,
@@ -66,13 +67,28 @@ def _load_affected_orders(
     db: Session, disruption_id: str
 ) -> List[tuple[Order, OrderLine]]:
     """Load all (Order, OrderLine) pairs linked to the disruption."""
+    order_ids_subq = select(DisruptionImpact.entity_id).where(
+        DisruptionImpact.disruption_id == disruption_id,
+        DisruptionImpact.entity_type == "order",
+    )
     stmt = (
         select(Order, OrderLine)
         .join(OrderLine, OrderLine.order_id == Order.id)
-        .where(Order.associated_disruption_id == disruption_id)
+        .where(
+            (Order.associated_disruption_id == disruption_id)
+            | (Order.id.in_(order_ids_subq))
+        )
         .order_by(Order.hours_until_breach.asc(), Order.id)
     )
-    return db.execute(stmt).all()
+    raw = db.execute(stmt).all()
+    seen: set[tuple[str, str]] = set()
+    result = []
+    for order, line in raw:
+        key = (order.id, line.id)
+        if key not in seen:
+            seen.add(key)
+            result.append((order, line))
+    return result
 
 
 def _to_candidate(order: Order, line: OrderLine) -> AllocationCandidate:

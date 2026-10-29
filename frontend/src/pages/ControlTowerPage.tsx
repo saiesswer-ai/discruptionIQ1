@@ -31,6 +31,8 @@ export const ControlTowerPage: React.FC = () => {
     disruptions,
     orders,
     approvals,
+    dashboardSummary,
+    currentUser,
     setActivePage,
     setArenaDisruptionId,
     setInspectDisruptionId,
@@ -38,9 +40,16 @@ export const ControlTowerPage: React.FC = () => {
 
   const activeDisruptions = disruptions.filter(d => d.status === 'active' || d.status === 'evaluating');
   const criticalOrders = orders.filter(o => o.riskLevel === 'critical' || o.priority === 'P1');
+  const canReadApprovals = currentUser?.permissions?.includes('approvals:read') || currentUser?.role === 'admin';
   const pendingApprovals = approvals.filter(a => a.status === 'pending');
+  const pendingApprovalsCount = canReadApprovals ? pendingApprovals.length : (dashboardSummary?.pendingApprovals ?? 0);
   const totalRecoveryCost = pendingApprovals.reduce((acc, curr) => acc + curr.estimatedCostUSD, 0);
   const totalProjectedSavings = pendingApprovals.reduce((acc, curr) => acc + curr.projectedSavingsUSD, 0);
+
+  // Clearly defined, consistent counting rules
+  const activeDisruptionsCount = dashboardSummary?.activeDisruptions ?? activeDisruptions.length;
+  const ordersAtRiskCount = dashboardSummary?.ordersAtRisk ?? new Set(orders.filter(o => o.riskLevel === 'critical' || o.riskLevel === 'high').map(o => o.id)).size;
+  const criticalOrdersCount = new Set(orders.filter(o => o.riskLevel === 'critical' || o.priority === 'P1').map(o => o.id)).size;
 
   const disruptionTrendData = Object.values(disruptions.reduce<Record<string, { day: string; delays: number; critical: number }>>((groups, disruption) => {
     const day = new Date(disruption.detectedAt).toLocaleDateString([], { month: 'short', day: 'numeric' });
@@ -52,12 +61,12 @@ export const ControlTowerPage: React.FC = () => {
   }, {}));
   const featuredDisruption = activeDisruptions[0] || disruptions[0];
 
-  // Risk distribution
+  // Risk distribution counting distinct customer orders
   const riskDistribution = [
-    { level: 'Critical (P1)', count: orders.filter(o => o.riskLevel === 'critical').length, color: '#f43f5e' },
-    { level: 'High (P2)', count: orders.filter(o => o.riskLevel === 'high').length, color: '#f59e0b' },
-    { level: 'Medium (P3)', count: orders.filter(o => o.riskLevel === 'medium').length, color: '#a855f7' },
-    { level: 'Protected', count: orders.filter(o => o.mitigationStatus === 'protected').length, color: '#10b981' },
+    { level: 'Critical (P1)', count: new Set(orders.filter(o => o.riskLevel === 'critical').map(o => o.id)).size, color: '#f43f5e' },
+    { level: 'High (P2)', count: new Set(orders.filter(o => o.riskLevel === 'high').map(o => o.id)).size, color: '#f59e0b' },
+    { level: 'Medium (P3)', count: new Set(orders.filter(o => o.riskLevel === 'medium').map(o => o.id)).size, color: '#a855f7' },
+    { level: 'Protected', count: new Set(orders.filter(o => o.mitigationStatus === 'protected').map(o => o.id)).size, color: '#10b981' },
   ];
 
   return (
@@ -97,7 +106,7 @@ export const ControlTowerPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Active Disruptions"
-          value={activeDisruptions.length}
+          value={activeDisruptionsCount}
           subValue={`${activeDisruptions.filter(d => d.severity === 'critical').length} critical events`}
           trend="Live backend count"
           trendType="negative"
@@ -106,8 +115,8 @@ export const ControlTowerPage: React.FC = () => {
         />
         <StatCard
           label="Orders at Risk"
-          value={orders.length}
-          subValue={`${criticalOrders.length} critical SLA exposure`}
+          value={ordersAtRiskCount}
+          subValue={`${criticalOrdersCount} critical SLA exposure`}
           trend="Live backend count"
           trendType="negative"
           icon={<ShieldAlert className="w-4 h-4 text-amber-400" />}
@@ -115,19 +124,19 @@ export const ControlTowerPage: React.FC = () => {
         />
         <StatCard
           label="Pending Approvals"
-          value={pendingApprovals.length}
-          subValue={`$${totalRecoveryCost.toLocaleString()} total authorization req`}
+          value={pendingApprovalsCount}
+          subValue={canReadApprovals ? `$${totalRecoveryCost.toLocaleString()} total authorization req` : 'Dashboard summary count'}
           trend="Live backend count"
           trendType="neutral"
           icon={<CheckSquare className="w-4 h-4 text-purple-400" />}
-          onClick={() => setActivePage('approvals')}
+          onClick={canReadApprovals ? () => setActivePage('approvals') : undefined}
         />
         <StatCard
           label="Est. Recovery Budget"
-          value={`$${totalRecoveryCost.toLocaleString()}`}
-          subValue={`Projected savings: $${totalProjectedSavings.toLocaleString()}`}
-          trend="Pending authorization total"
-          trendType="positive"
+          value={canReadApprovals ? `$${totalRecoveryCost.toLocaleString()}` : '—'}
+          subValue={canReadApprovals ? `Projected savings: $${totalProjectedSavings.toLocaleString()}` : 'Authorized for manager / approver roles'}
+          trend={canReadApprovals ? "Pending authorization total" : "Restricted financial view"}
+          trendType={canReadApprovals ? "positive" : "neutral"}
           icon={<DollarSign className="w-4 h-4 text-emerald-400" />}
           onClick={() => setActivePage('recovery-arena')}
         />
@@ -155,28 +164,35 @@ export const ControlTowerPage: React.FC = () => {
           </div>
 
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={disruptionTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="purpleArea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="roseArea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="day" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '6px', fontSize: '12px' }}
-                  labelStyle={{ color: '#cbd5e1' }}
-                />
-                <Area type="monotone" dataKey="delays" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#purpleArea)" name="Total Delays" />
-                <Area type="monotone" dataKey="critical" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#roseArea)" name="Critical Holds" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {disruptionTrendData.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-slate-500 text-xs gap-2">
+                <Activity className="w-6 h-6 text-slate-600" />
+                <span>No disruption telemetry recorded for this period</span>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={disruptionTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="purpleArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="roseArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" stroke="#64748b" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '6px', fontSize: '12px' }}
+                    labelStyle={{ color: '#cbd5e1' }}
+                  />
+                  <Area type="monotone" dataKey="delays" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#purpleArea)" name="Total Delays" />
+                  <Area type="monotone" dataKey="critical" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#roseArea)" name="Critical Holds" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 

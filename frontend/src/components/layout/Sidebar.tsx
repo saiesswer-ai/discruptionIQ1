@@ -13,6 +13,7 @@ import {
   Settings,
   Layers,
   ChevronRight,
+  LogOut,
 } from 'lucide-react';
 
 interface NavItem {
@@ -33,6 +34,8 @@ export const Sidebar: React.FC = () => {
     unreadNotificationsCount,
     orders,
     disruptions,
+    logout,
+    authState,
   } = useApp();
 
   const activeDisruptionsCount = disruptions.filter(d => d.status === 'active' || d.status === 'evaluating').length;
@@ -178,6 +181,15 @@ export const Sidebar: React.FC = () => {
 
       {/* Current User Card */}
       <div className="p-3 border-t border-slate-800/80 bg-slate-925">
+        {authState === 'authenticated' && <button
+          type="button"
+          onClick={() => { void logout(); }}
+          className="mb-2 w-full flex items-center justify-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-2.5 py-2 text-xs font-medium text-slate-300 transition-colors hover:border-purple-700 hover:bg-purple-950/40 hover:text-white"
+          title="Sign out and choose another role"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          Sign out / switch role
+        </button>}
         <div
           onClick={() => setActivePage('settings')}
           className="flex items-center justify-between p-2 rounded-md hover:bg-slate-900/80 cursor-pointer transition-colors"

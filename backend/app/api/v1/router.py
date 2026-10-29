@@ -21,14 +21,30 @@ from app.models.recovery import PlanAuditEvent, RecoveryPlan
 from app.schemas.approval import ApprovalRequest
 from app.schemas.audit import AuditLogDiff, AuditLogEntry
 from app.schemas.common import DashboardSummary
-from app.schemas.disruption import Disruption
+from app.schemas.disruption import Disruption, DisruptionCreate, DisruptionUpdate
 from app.schemas.intelligence import DisruptionDetail
-from app.schemas.inventory import WarehouseInventory
-from app.schemas.order import OrderAtRisk
-from app.schemas.shipment import Shipment
-from app.schemas.supplier import Supplier
+from app.schemas.inventory import (
+    InventoryAdjustmentRequest,
+    StockMovementRequest,
+    WarehouseInventory,
+)
+from app.schemas.order import OrderAtRisk, OrderCreate, OrderUpdate
+from app.schemas.shipment import Shipment, ShipmentCreate, ShipmentUpdate
+from app.schemas.supplier import Supplier, SupplierIssueCreate
 from app.schemas.webhook import CarrierWebhook
 from app.services.disruption_intelligence import disruption_detail, ingest_carrier_event
+from app.services.manual_data_service import (
+    adjust_inventory,
+    create_manual_disruption,
+    create_order,
+    create_shipment,
+    record_supplier_issue,
+    to_disruption_schema,
+    transfer_stock,
+    update_disruption,
+    update_order,
+    update_shipment,
+)
 from app.services.read_models import dashboard_summary, list_inventory, list_orders_at_risk, list_shipments, list_suppliers
 
 api_router = APIRouter()
@@ -80,22 +96,42 @@ def get_disruptions(
     if severity:
         statement = statement.where(DisruptionRecord.severity == severity)
     records = db.scalars(statement.order_by(DisruptionRecord.detected_at.desc())).all()
-    result: list[Disruption] = []
-    for record in records:
-        payload = json.loads(record.payload_json or "{}")
-        impacts = db.scalars(select(DisruptionImpact).where(DisruptionImpact.disruption_id == record.id)).all()
-        affected_skus = [impact.entity_id for impact in impacts if impact.entity_type == "sku"]
-        shipments = [impact.entity_id for impact in impacts if impact.entity_type == "shipment"]
-        warehouses = [impact.entity_id for impact in impacts if impact.entity_type == "warehouse"]
-        orders = [impact.entity_id for impact in impacts if impact.entity_type == "order"]
-        result.append(Disruption(
-            id=record.id, title=record.title, type=payload.get("type", "unknown"), typeLabel=payload.get("type", "unknown").replace("_", " ").title(),
-            severity=record.severity, status=record.status, detectedAt=record.detected_at.isoformat(), location="", carrierOrSupplier="",
-            delayHours=payload.get("delayHours", 0), affectedOrderCount=len(set(orders)), affectedSKUs=sorted(set(affected_skus)),
-            estimatedFinancialImpactUSD=0, summary=payload.get("summary", ""), rootCause="Deterministic carrier and inventory evidence",
-            eventPayload=payload, timeline=[], linkedShipmentIds=sorted(set(shipments)), linkedWarehouseIds=sorted(set(warehouses)),
-        ))
-    return result
+    return [to_disruption_schema(db, record) for record in records]
+
+
+@api_router.post("/disruptions", response_model=Disruption, status_code=status.HTTP_201_CREATED, tags=["Disruptions"])
+def report_disruption(
+    payload: DisruptionCreate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> Disruption:
+    """Report and persist an operational disruption with automatic entity linking."""
+    _check_perm(current_user, Permission.DISRUPTIONS_WRITE)
+    return create_manual_disruption(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
+@api_router.patch("/disruptions/{disruption_id}", response_model=Disruption, tags=["Disruptions"])
+def patch_disruption(
+    disruption_id: str,
+    payload: DisruptionUpdate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> Disruption:
+    """Update disruption status, severity, or add timeline evidence."""
+    _check_perm(current_user, Permission.DISRUPTIONS_WRITE)
+    return update_disruption(
+        db,
+        disruption_id=disruption_id,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+    )
 
 
 @api_router.get("/disruptions/{disruption_id}", response_model=DisruptionDetail, tags=["Disruptions"])
@@ -122,6 +158,42 @@ def get_orders_at_risk(
     return list_orders_at_risk(db, disruption_id, priority)
 
 
+@api_router.post("/orders", response_model=OrderAtRisk, status_code=status.HTTP_201_CREATED, tags=["Orders"])
+def create_new_order(
+    payload: OrderCreate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> OrderAtRisk:
+    """Create a customer order with validated lines and authoritative backend risk scoring."""
+    _check_perm(current_user, Permission.ORDERS_WRITE)
+    return create_order(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
+@api_router.patch("/orders/{order_id}", response_model=OrderAtRisk, tags=["Orders"])
+def patch_order(
+    order_id: str,
+    payload: OrderUpdate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> OrderAtRisk:
+    """Update order attributes and recalculate risk score deterministically."""
+    _check_perm(current_user, Permission.ORDERS_WRITE)
+    return update_order(
+        db,
+        order_id=order_id,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
 @api_router.get("/inventory", response_model=list[WarehouseInventory], tags=["Inventory"])
 def get_inventory(
     db: DbSession,
@@ -131,6 +203,38 @@ def get_inventory(
 ) -> list[WarehouseInventory]:
     _check_perm(current_user, Permission.INVENTORY_READ)
     return list_inventory(db, warehouse_id, sku)
+
+
+@api_router.post("/inventory/adjust", response_model=WarehouseInventory, tags=["Inventory"])
+def post_adjust_inventory(
+    payload: InventoryAdjustmentRequest,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> WarehouseInventory:
+    """Perform a transactional inventory adjustment preventing negative stock or reservation breach."""
+    _check_perm(current_user, Permission.INVENTORY_WRITE)
+    return adjust_inventory(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+    )
+
+
+@api_router.post("/inventory/transfer", tags=["Inventory"])
+def post_transfer_inventory(
+    payload: StockMovementRequest,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> dict:
+    """Execute a transactional stock movement between two physical warehouses."""
+    _check_perm(current_user, Permission.INVENTORY_WRITE)
+    return transfer_stock(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+    )
 
 
 @api_router.get("/shipments", response_model=list[Shipment], tags=["Shipments"])
@@ -143,10 +247,63 @@ def get_shipments(
     return list_shipments(db, status)
 
 
+@api_router.post("/shipments", response_model=Shipment, status_code=status.HTTP_201_CREATED, tags=["Shipments"])
+def post_create_shipment(
+    payload: ShipmentCreate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> Shipment:
+    """Register an inbound shipment and trigger disruption detection if delayed."""
+    _check_perm(current_user, Permission.SHIPMENTS_WRITE)
+    return create_shipment(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
+@api_router.patch("/shipments/{shipment_id}", response_model=Shipment, tags=["Shipments"])
+def patch_shipment(
+    shipment_id: str,
+    payload: ShipmentUpdate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> Shipment:
+    """Update shipment status/ETA and feed delay into the disruption intelligence workflow."""
+    _check_perm(current_user, Permission.SHIPMENTS_WRITE)
+    return update_shipment(
+        db,
+        shipment_id=shipment_id,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
 @api_router.get("/suppliers", response_model=list[Supplier], tags=["Suppliers"])
 def get_suppliers(db: DbSession, current_user: CurrentUser) -> list[Supplier]:
     _check_perm(current_user, Permission.SUPPLIERS_READ)
     return list_suppliers(db)
+
+
+@api_router.post("/suppliers/issues", response_model=Supplier, tags=["Suppliers"])
+def post_supplier_issue(
+    payload: SupplierIssueCreate,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> Supplier:
+    """Record an operational delay or quality incident against a supplier."""
+    _check_perm(current_user, Permission.SUPPLIERS_WRITE)
+    return record_supplier_issue(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
 
 
 @api_router.get("/approvals", response_model=list[ApprovalRequest], tags=["Approvals"])

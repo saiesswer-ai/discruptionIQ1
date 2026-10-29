@@ -2,7 +2,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import ApprovalRecord, DisruptionRecord, Inventory, Order, OrderLine, Shipment, Supplier, Warehouse
+from app.models import ApprovalRecord, DisruptionRecord, Inventory, Order, OrderLine, RecoveryPlan, Shipment, Supplier, Warehouse
 from app.schemas.common import DashboardSummary
 from app.schemas.inventory import WarehouseInventory
 from app.schemas.order import OrderAtRisk
@@ -93,10 +93,13 @@ def dashboard_summary(db: Session) -> DashboardSummary:
     def count(statement: object) -> int:
         return int(db.scalar(statement) or 0)
 
+    pending_plans = count(select(func.count()).select_from(RecoveryPlan).where(RecoveryPlan.status == "submitted"))
+    pending_approvals_rec = count(select(func.count()).select_from(ApprovalRecord).where(ApprovalRecord.status == "pending"))
+
     return DashboardSummary(
         activeDisruptions=count(select(func.count()).select_from(DisruptionRecord).where(DisruptionRecord.status == "active")),
         ordersAtRisk=count(select(func.count()).select_from(Order).where(Order.risk_level.in_(("critical", "high")))),
         delayedShipments=count(select(func.count()).select_from(Shipment).where(Shipment.status.in_(("delayed", "customs_hold")))),
         constrainedInventoryItems=count(select(func.count()).select_from(Inventory).where(Inventory.status.in_(("constrained", "critical")))),
-        pendingApprovals=count(select(func.count()).select_from(ApprovalRecord).where(ApprovalRecord.status == "pending")),
+        pendingApprovals=pending_plans + pending_approvals_rec,
     )

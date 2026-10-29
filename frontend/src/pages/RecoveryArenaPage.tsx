@@ -81,7 +81,10 @@ export const RecoveryArenaPage: React.FC = () => {
         }
       }).catch(err => showToast(err.message || 'Unable to load recovery plans.', 'error'));
     }
-  }, [activeDisruption, disruptions]);
+  // Only re-fetch when the selected disruption ID changes, not when the full
+  // disruptions array reference changes (which happens on every refreshData call).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDisruption?.id]);
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
   const affectedOrders = orders.filter(o => o.associatedDisruptionId === activeDisruption?.id);

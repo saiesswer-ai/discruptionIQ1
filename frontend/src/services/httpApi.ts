@@ -12,6 +12,117 @@ export interface AuthUserResponse { id: string; username: string; email: string;
 export interface LoginResponse { access_token: string; token_type: 'bearer'; expires_in: number; user: AuthUserResponse; }
 export interface DashboardSummary { activeDisruptions: number; ordersAtRisk: number; delayedShipments: number; constrainedInventoryItems: number; pendingApprovals: number; }
 
+export interface CreateDisruptionPayload {
+  type: string;
+  title: string;
+  severity: string;
+  status?: string;
+  location: string;
+  carrierOrSupplier?: string;
+  delayHours?: number;
+  summary: string;
+  rootCause?: string;
+  source?: string;
+  affectedShipmentId?: string;
+  affectedSupplierId?: string;
+  affectedWarehouseId?: string;
+  affectedOrderIds?: string[];
+  affectedSKUs?: string[];
+  estimatedFinancialImpactUSD?: number;
+  reason?: string;
+  idempotencyKey?: string;
+}
+
+export interface UpdateDisruptionPayload {
+  status?: string;
+  severity?: string;
+  delayHours?: number;
+  title?: string;
+  summary?: string;
+  estimatedFinancialImpactUSD?: number;
+  reason: string;
+  newEvidence?: Record<string, any>;
+  newTimelineEvent?: Record<string, any>;
+}
+
+export interface InventoryAdjustmentPayload {
+  warehouseId: string;
+  sku: string;
+  adjustmentType?: string;
+  quantityDelta?: number;
+  newOnHandUnits?: number;
+  reason: string;
+  reference?: string;
+}
+
+export interface StockMovementPayload {
+  fromWarehouseId: string;
+  toWarehouseId: string;
+  sku: string;
+  quantity: number;
+  reason: string;
+  reference?: string;
+}
+
+export interface CreateShipmentPayload {
+  trackingNumber: string;
+  carrierName: string;
+  transportMode: string;
+  origin: string;
+  destination: string;
+  promisedDeliveryDate: string;
+  estimatedDeliveryDate: string;
+  supplierId: string;
+  cargoDescription: string;
+  reason?: string;
+}
+
+export interface UpdateShipmentPayload {
+  estimatedDeliveryDate?: string;
+  status?: string;
+  currentLocation?: string;
+  delayHours?: number;
+  reason: string;
+}
+
+export interface SupplierIssuePayload {
+  supplierId: string;
+  issueType: string;
+  title: string;
+  description: string;
+  severity?: string;
+  estimatedDelayDays?: number;
+  reason: string;
+}
+
+export interface OrderLinePayload {
+  sku: string;
+  quantity: number;
+  unitPriceUSD: number;
+  skuDescription?: string;
+}
+
+export interface CreateOrderPayload {
+  customerName: string;
+  customerTier: string;
+  priority: string;
+  promisedDeadline: string;
+  primaryWarehouseId: string;
+  fulfillmentPolicy?: string;
+  orderLines: OrderLinePayload[];
+  reason?: string;
+}
+
+export interface UpdateOrderPayload {
+  priority?: string;
+  promisedDeadline?: string;
+  customerTier?: string;
+  fulfillmentPolicy?: string;
+  mitigationStatus?: string;
+  primaryWarehouseId?: string;
+  reason: string;
+}
+
 export const toUserProfile = (user: AuthUserResponse): UserProfile => ({
   id: user.id, name: user.fullName, role: user.role, roleLabel: user.role.replaceAll('_', ' '), approvalLimitUSD: user.approvalLimitUSD,
   avatarInitials: user.fullName.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(), permissions: user.permissions,
@@ -53,6 +164,15 @@ class FastApiClient {
   getSuppliers() { return this.request<Supplier[]>('/suppliers'); }
   getApprovals() { return this.request<ApprovalRequest[]>('/approvals'); }
   getAuditLogs() { return this.request<AuditLogEntry[]>('/audit'); }
+  createDisruption(data: CreateDisruptionPayload) { return this.request<Disruption>('/disruptions', { method: 'POST', body: JSON.stringify(data) }); }
+  updateDisruption(id: string, data: UpdateDisruptionPayload) { return this.request<Disruption>(`/disruptions/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
+  adjustInventory(data: InventoryAdjustmentPayload) { return this.request<WarehouseInventory>('/inventory/adjust', { method: 'POST', body: JSON.stringify(data) }); }
+  transferInventory(data: StockMovementPayload) { return this.request<{ source: WarehouseInventory; destination: WarehouseInventory }>('/inventory/transfer', { method: 'POST', body: JSON.stringify(data) }); }
+  createShipment(data: CreateShipmentPayload) { return this.request<Shipment>('/shipments', { method: 'POST', body: JSON.stringify(data) }); }
+  updateShipment(id: string, data: UpdateShipmentPayload) { return this.request<Shipment>(`/shipments/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
+  recordSupplierIssue(data: SupplierIssuePayload) { return this.request<Supplier>('/suppliers/issues', { method: 'POST', body: JSON.stringify(data) }); }
+  createOrder(data: CreateOrderPayload) { return this.request<OrderAtRisk>('/orders', { method: 'POST', body: JSON.stringify(data) }); }
+  updateOrder(id: string, data: UpdateOrderPayload) { return this.request<OrderAtRisk>(`/orders/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
   getRecoveryPlans(disruptionId: string) { return this.request<RecoveryPlan[]>(`/recovery/${encodeURIComponent(disruptionId)}/plans`); }
   createRecoveryPlans(disruptionId: string) { return this.request<RecoveryPlan[]>('/recovery/plans', { method: 'POST', body: JSON.stringify({ disruptionId }) }); }
   simulatePlan(planId: string) { return this.request<RecoveryPlan>(`/recovery/plans/${encodeURIComponent(planId)}/simulate`, { method: 'POST' }); }
