@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
+import { LiveLocationModal } from '../components/common/LiveLocationModal';
+import { LIVE_TRACKING_TRACKING_IDS } from '../constants/trackingConstants';
 import { api } from '../services/httpApi';
 import { Shipment, Supplier } from '../types';
 import {
@@ -18,6 +20,7 @@ import {
   PlusCircle,
   Edit,
   AlertOctagon,
+  MapPin,
 } from 'lucide-react';
 
 export const ShipmentsPage: React.FC = () => {
@@ -29,6 +32,7 @@ export const ShipmentsPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [liveTrackingShipment, setLiveTrackingShipment] = useState<Shipment | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Selected entities for updates
@@ -299,10 +303,23 @@ export const ShipmentsPage: React.FC = () => {
                       <div className="text-[11px] text-slate-400 font-sans">{s.carrierName}</div>
                     </td>
                     <td className="py-3 px-4 font-sans">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
-                        {getTransportIcon(s.transportMode)}
-                        <span>{s.transportMode}</span>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300 shrink-0">
+                          {getTransportIcon(s.transportMode)}
+                          <span>{s.transportMode}</span>
+                        </span>
+                        {LIVE_TRACKING_TRACKING_IDS.includes(s.trackingNumber) && (
+                          <button
+                            type="button"
+                            onClick={() => setLiveTrackingShipment(s)}
+                            aria-label={`View live location of ${s.trackingNumber}`}
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-950/60 hover:bg-purple-900/80 border border-purple-800/60 hover:border-purple-600 text-[11px] font-medium text-purple-300 hover:text-purple-100 transition-colors cursor-pointer shrink-0"
+                          >
+                            <MapPin className="w-3 h-3 text-purple-400" />
+                            <span>Live Location</span>
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3 px-4 font-sans text-slate-200 text-[11px]">
                       <div>{s.origin}</div>
@@ -743,6 +760,13 @@ export const ShipmentsPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Modal 4: Live Location Tracking */}
+      <LiveLocationModal
+        isOpen={!!liveTrackingShipment}
+        onClose={() => setLiveTrackingShipment(null)}
+        shipment={liveTrackingShipment}
+      />
     </div>
   );
 };
