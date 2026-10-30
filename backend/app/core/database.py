@@ -132,6 +132,10 @@ def init_database() -> None:
                 if "is_demo" not in ord_cols:
                     connection.execute(text("ALTER TABLE orders ADD COLUMN is_demo BOOLEAN DEFAULT 0"))
                     connection.commit()
+                if "order_ref" not in ord_cols:
+                    connection.execute(text("ALTER TABLE orders ADD COLUMN order_ref VARCHAR(64)"))
+                    connection.execute(text("CREATE INDEX IF NOT EXISTS ix_orders_order_ref ON orders (order_ref)"))
+                    connection.commit()
 
             if "order_lines" in existing_tables:
                 ol_cols = {c["name"] for c in inspector.get_columns("order_lines")}

@@ -13,7 +13,7 @@ from math import ceil
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
@@ -32,7 +32,14 @@ from app.schemas.inventory import (
     StockMovementRequest,
     WarehouseInventory,
 )
-from app.schemas.order import OrderAtRisk, OrderCreate, OrderUpdate
+from app.schemas.order import (
+    BulkOrderCreateRequest,
+    BulkOrderCreateResponse,
+    BulkOrderResultItem,
+    OrderAtRisk,
+    OrderCreate,
+    OrderUpdate,
+)
 from app.schemas.shipment import Shipment as ShipmentSchema, ShipmentCreate, ShipmentUpdate
 from app.schemas.supplier import Supplier as SupplierSchema, SupplierIssueCreate
 from app.services.disruption_intelligence import _detect_for_shipment, _impact_and_score, _risk_level, _shipment_skus
@@ -931,6 +938,9 @@ def create_order(
     actor_id: str,
     actor_role: str,
     settings: Settings,
+    *,
+    order_id_override: str | None = None,
+    order_ref: str | None = None,
 ) -> OrderAtRisk:
     """Create a customer order with validated lines and authoritative risk scoring."""
     warehouse = db.get(Warehouse, payload.primaryWarehouseId)
@@ -950,7 +960,7 @@ def create_order(
     now = settings.simulation_clock.replace(tzinfo=timezone.utc if settings.simulation_clock.tzinfo is None else settings.simulation_clock.tzinfo)
     hours_until_breach = max(0, ceil((deadline - now).total_seconds() / 3600))
 
-    order_id = f"ORD-MANUAL-{uuid.uuid4().hex[:6].upper()}"
+    order_id = order_id_override or f"ORD-MANUAL-{uuid.uuid4().hex[:6].upper()}"
     total_val = 0.0
 
     lines: list[OrderLine] = []
@@ -972,6 +982,7 @@ def create_order(
 
     order = Order(
         id=order_id,
+        order_ref=order_ref,
         customer_name=payload.customerName,
         customer_tier=payload.customerTier,
         priority=payload.priority,
@@ -1028,6 +1039,219 @@ def create_order(
         fulfillmentPolicy=order.fulfillment_policy,
         explanation=order.explanation,
         mitigationStatus=order.mitigation_status,
+    )
+
+
+def bulk_create_orders(
+    db: Session,
+    payload: BulkOrderCreateRequest,
+    actor_id: str,
+    actor_role: str,
+    settings: Settings,
+) -> BulkOrderCreateResponse:
+    """Import a batch of customer orders with validation, idempotency, and audit logging."""
+    results: list[BulkOrderResultItem] = []
+    successful_count = 0
+    failed_count = 0
+    seen_in_batch: set[str] = set()
+
+    for item in payload.orders:
+        ref = item.orderRef.strip()
+        if not ref:
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    reason="Missing order reference.",
+                )
+            )
+            failed_count += 1
+            continue
+
+        if ref in seen_in_batch:
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    reason=f"Duplicate order reference '{ref}' within the same import batch.",
+                )
+            )
+            failed_count += 1
+            continue
+        seen_in_batch.add(ref)
+
+        # Idempotency check against database
+        expected_order_id = f"ORD-{ref}"
+        existing = db.scalar(
+            select(Order).where(
+                or_(
+                    Order.order_ref == ref,
+                    Order.id == expected_order_id,
+                )
+            ).limit(1)
+        )
+        if existing:
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    orderId=existing.id,
+                    orderValueUSD=float(existing.order_value_usd) if existing.order_value_usd else None,
+                    riskScore=existing.risk_score,
+                    riskLevel=existing.risk_level,
+                    reason=f"Duplicate order: order reference '{ref}' has already been imported as '{existing.id}'.",
+                )
+            )
+            failed_count += 1
+            continue
+
+        # Server-side validation
+        if not item.orderLines:
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    reason="Order must contain at least one order line.",
+                )
+            )
+            failed_count += 1
+            continue
+
+        # Verify warehouse
+        warehouse = db.get(Warehouse, item.primaryWarehouseId)
+        if not warehouse:
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    reason=f"Primary warehouse '{item.primaryWarehouseId}' not found.",
+                )
+            )
+            failed_count += 1
+            continue
+
+        # Verify lines
+        has_line_error = False
+        seen_skus: set[str] = set()
+        for idx, line in enumerate(item.orderLines):
+            if line.quantity <= 0:
+                results.append(
+                    BulkOrderResultItem(
+                        orderRef=ref,
+                        success=False,
+                        reason=f"Line {idx + 1}: quantity must be greater than 0.",
+                    )
+                )
+                has_line_error = True
+                break
+            if line.unitPriceUSD <= 0:
+                results.append(
+                    BulkOrderResultItem(
+                        orderRef=ref,
+                        success=False,
+                        reason=f"Line {idx + 1}: unit price must be greater than 0.",
+                    )
+                )
+                has_line_error = True
+                break
+            if line.sku in seen_skus:
+                results.append(
+                    BulkOrderResultItem(
+                        orderRef=ref,
+                        success=False,
+                        reason=f"Duplicate SKU '{line.sku}' in order '{ref}'.",
+                    )
+                )
+                has_line_error = True
+                break
+            seen_skus.add(line.sku)
+
+            # Check if SKU exists in inventory
+            inv = db.scalar(select(Inventory).where(Inventory.sku == line.sku).limit(1))
+            if not inv:
+                results.append(
+                    BulkOrderResultItem(
+                        orderRef=ref,
+                        success=False,
+                        reason=f"Line {idx + 1}: SKU '{line.sku}' is not recognized in catalog.",
+                    )
+                )
+                has_line_error = True
+                break
+
+        if has_line_error:
+            failed_count += 1
+            continue
+
+        try:
+            # Construct OrderCreate payload
+            order_create = OrderCreate(
+                customerName=item.customerName,
+                customerTier=item.customerTier,
+                priority=item.priority,
+                promisedDeadline=item.promisedDeadline,
+                primaryWarehouseId=item.primaryWarehouseId,
+                fulfillmentPolicy=item.fulfillmentPolicy,
+                orderLines=item.orderLines,
+                reason=f"Bulk CSV import [{ref}]: {payload.auditJustification}",
+            )
+            created = create_order(
+                db=db,
+                payload=order_create,
+                actor_id=actor_id,
+                actor_role=actor_role,
+                settings=settings,
+                order_id_override=expected_order_id,
+                order_ref=ref,
+            )
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=True,
+                    orderId=created.id,
+                    orderValueUSD=created.orderValueUSD,
+                    riskScore=created.riskScore,
+                    riskLevel=created.riskLevel,
+                    primaryRootCause=created.explanation,
+                    reason="Order created successfully.",
+                )
+            )
+            successful_count += 1
+        except Exception as exc:
+            db.rollback()
+            results.append(
+                BulkOrderResultItem(
+                    orderRef=ref,
+                    success=False,
+                    reason=f"Failed to create order: {str(exc)}",
+                )
+            )
+            failed_count += 1
+
+    # Record overall bulk import audit event if any orders were processed
+    if payload.orders:
+        record_audit(
+            db,
+            actor_id=actor_id,
+            actor_role=actor_role,
+            action="BULK_IMPORT_ORDERS",
+            entity_type="OrderBatch",
+            entity_id=f"BATCH-{uuid.uuid4().hex[:8].upper()}",
+            reason=payload.auditJustification,
+            after_state={
+                "total": len(payload.orders),
+                "successful": successful_count,
+                "failed": failed_count,
+                "importedRefs": [r.orderRef for r in results if r.success],
+            },
+        )
+        db.commit()
+
+    return BulkOrderCreateResponse(
+        results=results,
+        totalProcessed=len(payload.orders),
+        successfulCount=successful_count,
+        failedCount=failed_count,
     )
 
 
