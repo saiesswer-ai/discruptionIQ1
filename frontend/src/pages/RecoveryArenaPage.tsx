@@ -29,6 +29,7 @@ import {
   ArrowRight,
   PackageCheck,
   FileCheck2,
+  Sparkles,
 } from 'lucide-react';
 
 export const RecoveryArenaPage: React.FC = () => {
@@ -49,12 +50,12 @@ export const RecoveryArenaPage: React.FC = () => {
   const [selectedPlanId, setSelectedPlanId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'comparison' | 'allocation' | 'constraints'>('comparison');
 
-  // Confirmation Modals State (Requirement 9: Require explicit confirmation before changing a simulated state)
+  // Confirmation Modals State
   const [planToSimulate, setPlanToSimulate] = useState<RecoveryPlan | null>(null);
   const [isSimulatingProgress, setIsSimulatingProgress] = useState<boolean>(false);
   const [simulationStepText, setSimulationStepText] = useState<string>('');
 
-  // Simulation Preview Modal (Requirement 8: Select a plan and open simulation preview)
+  // Simulation Preview Modal
   const [previewPlan, setPreviewPlan] = useState<RecoveryPlan | null>(null);
 
   // Modify Plan Modal
@@ -62,7 +63,7 @@ export const RecoveryArenaPage: React.FC = () => {
   const [modifyUnits, setModifyUnits] = useState<number>(0);
   const [modifyCost, setModifyCost] = useState<number>(0);
 
-  // Submit for Approval Modal (Requirement 10: Submit for approval action creating pending request)
+  // Submit for Approval Modal
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState<boolean>(false);
   const [justificationNotes, setJustificationNotes] = useState<string>('');
 
@@ -75,25 +76,20 @@ export const RecoveryArenaPage: React.FC = () => {
       api.getRecoveryPlans(activeDisruption.id).then(loadedPlans => {
         setPlans(loadedPlans);
         if (loadedPlans.length > 0) {
-          // If previous selection isn't in new disruption's plans, pick the first
           if (!loadedPlans.some(p => p.id === selectedPlanId)) {
             setSelectedPlanId(loadedPlans[0].id);
           }
         }
       }).catch(err => showToast(err.message || 'Unable to load recovery plans.', 'error'));
     }
-  // Only re-fetch when the selected disruption ID changes, not when the full
-  // disruptions array reference changes (which happens on every refreshData call).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDisruption?.id]);
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
   const affectedOrders = orders.filter(o => o.associatedDisruptionId === activeDisruption?.id);
-  const relevantInventory = inventory.filter(i => activeDisruption?.affectedSKUs.includes(i.sku));
+  const relevantInventory = inventory.filter(i => activeDisruption?.affectedSKUs?.includes(i.sku));
 
   // --- Handlers ---
-
-  // Trigger confirmation modal for simulation (Requirement 9)
   const handleRequestSimulation = (plan: RecoveryPlan) => {
     setPlanToSimulate(plan);
   };
@@ -114,7 +110,6 @@ export const RecoveryArenaPage: React.FC = () => {
     }
   };
 
-  // Confirmed simulation execution
   const handleConfirmSimulation = async () => {
     if (!planToSimulate) return;
     const targetPlan = planToSimulate;
@@ -124,7 +119,7 @@ export const RecoveryArenaPage: React.FC = () => {
     setSimulationStepText('Auditing physical warehouse unreserved stock allocations...');
 
     setTimeout(() => {
-      setSimulationStepText('Validating airline cargo pallet capacity & bonded freight slots...');
+      setSimulationStepText('Validating carrier freight slots & cargo pallet capacities...');
     }, 450);
 
     setTimeout(() => {
@@ -149,14 +144,12 @@ export const RecoveryArenaPage: React.FC = () => {
     }, 1400);
   };
 
-  // Open Modify Modal
   const handleOpenModify = (plan: RecoveryPlan) => {
     setModifyUnits(plan.unitsAllocated);
     setModifyCost(plan.estimatedCostUSD);
     setIsModifyModalOpen(true);
   };
 
-  // Save modified parameters
   const handleSaveModification = async () => {
     if (!selectedPlan) return;
     try {
@@ -171,7 +164,6 @@ export const RecoveryArenaPage: React.FC = () => {
     }
   };
 
-  // Submit for Approval (Requirement 10)
   const handleSubmitForApproval = async () => {
     if (!selectedPlan) return;
     try {
@@ -189,7 +181,6 @@ export const RecoveryArenaPage: React.FC = () => {
     }
   };
 
-  // Execute Plan (only after approval)
   const handleExecute = async (plan: RecoveryPlan) => {
     if (!window.confirm(`Execute ${plan.name}? This will commit the approved allocation and cannot be undone from the UI.`)) return;
     try {
@@ -204,103 +195,116 @@ export const RecoveryArenaPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Banner & Disruption Context Selector */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-400">
-              Recovery Arena · Scenario Evaluation
-            </span>
-            <SeverityBadge severity={activeDisruption?.severity || 'critical'} />
-            <StatusBadge status={activeDisruption?.status || 'active'} />
-            <span className="text-[10px] text-slate-500 font-mono">Deterministic Engine v2.4</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <select
-              value={activeDisruption?.id}
-              onChange={e => setArenaDisruptionId(e.target.value)}
-              className="bg-slate-950 border border-slate-700 rounded-md px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-purple-500"
-            >
-              {disruptions.map(d => (
-                <option key={d.id} value={d.id}>
-                  {d.id} — {d.title} (+{d.delayHours}h delay)
-                </option>
-              ))}
-            </select>
-          </div>
-          <p className="text-xs text-slate-400 mt-2 max-w-2xl leading-relaxed">
-            {activeDisruption?.summary}
-          </p>
-        </div>
+      {/* 1. Header Banner & Disruption Context Selector (InsightOS Dark Feature Panel) */}
+      <div className="card-hero p-6 sm:p-7 relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-96 h-96 rounded-full bg-[#C8FF32]/8 blur-3xl pointer-events-none" />
 
-        {/* Quick Disruption Exposure Metrics */}
-        <div className="flex items-center gap-4 text-xs font-mono bg-slate-950 p-3 rounded-lg border border-slate-800 shrink-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Delay</span>
-            <span className="text-amber-400 font-bold text-sm">+{activeDisruption?.delayHours}h</span>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#A0A69E]">
+                Recovery Arena
+              </span>
+              <span className="text-[10px] font-mono text-[#080908] bg-[#C8FF32] font-bold px-2 py-0.5 rounded-full">
+                AI SCENARIO EVALUATION
+              </span>
+              <SeverityBadge severity={activeDisruption?.severity || 'critical'} />
+              <StatusBadge status={activeDisruption?.status || 'active'} />
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <select
+                value={activeDisruption?.id}
+                onChange={e => setArenaDisruptionId(e.target.value)}
+                className="bg-[#171917] border border-[#2F342F] rounded-xl px-3.5 py-2 text-sm font-semibold text-white focus:outline-none focus:border-[#C8FF32] focus:ring-1 focus:ring-[#C8FF32]"
+              >
+                {disruptions.map(d => (
+                  <option key={d.id} value={d.id}>
+                    {d.id} — {d.title} (+{d.delayHours}h delay)
+                  </option>
+                ))}
+              </select>
+
+              {plans.length === 0 && (
+                <button
+                  onClick={handleGeneratePlans}
+                  className="btn-lime text-xs py-2 px-4 whitespace-nowrap"
+                >
+                  <Sparkles className="w-3.5 h-3.5 fill-[#080908]" />
+                  <span>Generate Candidate Plans</span>
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs text-[#A0A69D] mt-2.5 max-w-2xl leading-relaxed">
+              {activeDisruption?.summary}
+            </p>
           </div>
-          {plans.length === 0 && (
-            <button onClick={handleGeneratePlans} className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold">
-              Generate Candidate Plans
-            </button>
-          )}
-          <div className="h-7 w-px bg-slate-800" />
-          <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Orders Exposed</span>
-            <span className="text-white font-bold text-sm">{affectedOrders.length}</span>
-          </div>
-          <div className="h-7 w-px bg-slate-800" />
-          <div>
-            <span className="text-slate-500 block text-[10px] uppercase">Financial Risk</span>
-            <span className="text-rose-400 font-bold text-sm">
-              ${activeDisruption ? (activeDisruption.estimatedFinancialImpactUSD / 1000).toFixed(0) : 0}k
-            </span>
+
+          {/* Quick Disruption Exposure Metrics */}
+          <div className="flex items-center gap-4 text-xs font-mono bg-[#171917] p-3.5 rounded-2xl border border-[#2B2F2B] shrink-0">
+            <div>
+              <span className="text-[#777B76] block text-[10px] uppercase font-semibold">Delay</span>
+              <span className="text-[#F5C451] font-bold text-base">+{activeDisruption?.delayHours}h</span>
+            </div>
+            <div className="h-8 w-px bg-[#2B2F2B]" />
+            <div>
+              <span className="text-[#777B76] block text-[10px] uppercase font-semibold">Orders Exposed</span>
+              <span className="text-white font-bold text-base">{affectedOrders.length}</span>
+            </div>
+            <div className="h-8 w-px bg-[#2B2F2B]" />
+            <div>
+              <span className="text-[#777B76] block text-[10px] uppercase font-semibold">Financial Risk</span>
+              <span className="text-[#E85D68] font-bold text-base">
+                ${activeDisruption ? (activeDisruption.estimatedFinancialImpactUSD / 1000).toFixed(0) : 0}k
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {generationFeedback && (
-        <div className="-mt-3 p-3 bg-amber-950/40 border border-amber-800/70 rounded text-xs text-amber-200">
-          <strong>Candidate plans were not generated.</strong> {generationFeedback}
+        <div className="p-4 bg-[#FEF6E4] border border-[#F9DC9B] rounded-2xl text-xs text-[#805400] font-medium">
+          <strong>Candidate plans were not generated:</strong> {generationFeedback}
         </div>
       )}
 
       {/* 2. Disruption Affected Orders & Warehouse Inventory Availability Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Affected Orders Panel */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-              <Shield className="w-3.5 h-3.5 text-rose-400" />
+        <div className="card-light p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#E85D68]" />
               <span>Affected Customer Orders ({affectedOrders.length})</span>
             </h4>
-            <span className="text-[10px] font-mono text-slate-400">Ranked by SLA Window</span>
+            <span className="text-[11px] font-mono text-[#777B76]">Ranked by SLA Window</span>
           </div>
 
-          <div className="space-y-2 max-h-56 overflow-y-auto">
+          <div className="space-y-2.5 max-h-60 overflow-y-auto">
             {affectedOrders.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">No active orders linked to this disruption.</p>
+              <p className="text-xs text-[#777B76] py-6 text-center">No active orders linked to this disruption.</p>
             ) : (
               affectedOrders.map(o => (
                 <div
                   key={o.id}
-                  className="p-2.5 bg-slate-950/70 border border-slate-800/80 rounded flex items-center justify-between text-xs"
+                  className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl flex items-center justify-between text-xs hover:border-[#D1D6CB] transition-colors"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-white">{o.id}</span>
+                      <span className="font-mono font-bold text-[#171917]">{o.id}</span>
                       <PriorityBadge priority={o.priority} />
-                      <span className="text-slate-300 font-medium">{o.customerName}</span>
+                      <span className="text-[#171917] font-semibold">{o.customerName}</span>
                     </div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-                      SKU: <strong className="text-slate-200">{o.sku}</strong> · Demand: <strong className="text-slate-200">{o.quantityUnits}</strong> units · Exposure: ${o.orderValueUSD.toLocaleString()}
+                    <div className="text-[11px] text-[#777B76] font-mono mt-1">
+                      SKU: <strong className="text-[#171917]">{o.sku}</strong> · Demand: <strong className="text-[#171917]">{o.quantityUnits}</strong> units · Exposure: ${o.orderValueUSD.toLocaleString()}
                     </div>
                   </div>
                   <div className="text-right font-mono">
-                    <span className={`text-[11px] font-semibold ${o.hoursUntilBreach <= 24 ? 'text-rose-400' : 'text-amber-400'}`}>
+                    <span className={`text-[11px] font-bold ${o.hoursUntilBreach <= 24 ? 'text-[#9E1B26]' : 'text-[#805400]'}`}>
                       {o.hoursUntilBreach}h to breach
                     </span>
-                    <div className="text-[10px] text-slate-500 capitalize">
+                    <div className="text-[10px] text-[#777B76] capitalize">
                       {o.mitigationStatus.replace('_', ' ')}
                     </div>
                   </div>
@@ -311,41 +315,41 @@ export const RecoveryArenaPage: React.FC = () => {
         </div>
 
         {/* Available Inventory by Warehouse and SKU */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-              <Warehouse className="w-3.5 h-3.5 text-sky-400" />
-              <span>Network Stock Availability by Warehouse & SKU</span>
+        <div className="card-light p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider flex items-center gap-2">
+              <Warehouse className="w-4 h-4 text-[#7185FF]" />
+              <span>Network Stock Availability by Hub & SKU</span>
             </h4>
-            <span className="text-[10px] font-mono text-slate-400">Physical Unreserved Pools</span>
+            <span className="text-[11px] font-mono text-[#777B76]">Physical Unreserved Pools</span>
           </div>
 
-          <div className="space-y-2 max-h-56 overflow-y-auto">
+          <div className="space-y-2.5 max-h-60 overflow-y-auto">
             {relevantInventory.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">No stock found for these SKUs in network.</p>
+              <p className="text-xs text-[#777B76] py-6 text-center">No stock found for these SKUs in network.</p>
             ) : (
               relevantInventory.map(inv => (
                 <div
                   key={inv.id}
-                  className="p-2.5 bg-slate-950/70 border border-slate-800/80 rounded flex items-center justify-between text-xs"
+                  className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl flex items-center justify-between text-xs hover:border-[#D1D6CB] transition-colors"
                 >
                   <div>
-                    <div className="font-semibold text-white">{inv.warehouseName}</div>
-                    <div className="text-[11px] text-slate-400 font-mono">
-                      {inv.warehouseLocation} · SKU: <strong className="text-slate-200">{inv.sku}</strong>
+                    <div className="font-bold text-[#171917]">{inv.warehouseName}</div>
+                    <div className="text-[11px] text-[#777B76] font-mono mt-0.5">
+                      {inv.warehouseLocation} · SKU: <strong className="text-[#171917]">{inv.sku}</strong>
                     </div>
                   </div>
                   <div className="text-right font-mono">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div>
-                        <span className="text-[10px] text-slate-500 block">Available</span>
-                        <span className={`font-bold ${inv.availableUnits > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <span className="text-[10px] text-[#777B76] block">Available</span>
+                        <span className={`font-bold ${inv.availableUnits > 0 ? 'text-[#2E7D32]' : 'text-[#9E1B26]'}`}>
                           {inv.availableUnits} units
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-500 block">Safety Min</span>
-                        <span className="text-slate-400">{inv.safetyStockThreshold}</span>
+                        <span className="text-[10px] text-[#777B76] block">Safety Min</span>
+                        <span className="text-[#777B76] font-medium">{inv.safetyStockThreshold}</span>
                       </div>
                     </div>
                   </div>
@@ -356,47 +360,47 @@ export const RecoveryArenaPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Three Distinct Candidate Recovery Plans Comparison (Requirements 3, 4, 7) */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+      {/* 3. Three Distinct Candidate Recovery Plans Comparison */}
+      <div className="card-light p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <Zap className="w-4 h-4 text-purple-400" />
+            <h3 className="text-base font-bold text-[#171917] flex items-center gap-2">
+              <Zap className="w-4 h-4 text-[#171917]" />
               <span>Candidate Recovery Plans (Deterministic Scenario Comparison)</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Side-by-side evaluation of 3 distinct recovery routes against cost, SLA preservation, lateness, and physical constraints.
+            <p className="text-xs text-[#777B76] mt-0.5">
+              Side-by-side evaluation of recovery routes against cost, SLA preservation, lateness, and physical constraints.
             </p>
           </div>
 
           {/* Interactive view toggles */}
-          <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800 text-xs">
+          <div className="flex items-center gap-1 p-1 bg-[#F0F1EE] rounded-xl border border-[#E8EAE4] text-xs">
             <button
               onClick={() => setActiveTab('comparison')}
-              className={`px-3 py-1.5 font-medium rounded-md transition-colors ${
+              className={`px-3.5 py-1.5 font-semibold rounded-lg transition-colors ${
                 activeTab === 'comparison'
-                  ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
               Side-by-Side Plans
             </button>
             <button
               onClick={() => setActiveTab('allocation')}
-              className={`px-3 py-1.5 font-medium rounded-md transition-colors ${
+              className={`px-3.5 py-1.5 font-semibold rounded-lg transition-colors ${
                 activeTab === 'allocation'
-                  ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
               Order Allocation Table
             </button>
             <button
               onClick={() => setActiveTab('constraints')}
-              className={`px-3 py-1.5 font-medium rounded-md transition-colors ${
+              className={`px-3.5 py-1.5 font-semibold rounded-lg transition-colors ${
                 activeTab === 'constraints'
-                  ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
               Assumptions & Constraints
@@ -404,7 +408,7 @@ export const RecoveryArenaPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab A: Side-by-Side Plan Comparison (Requirements 4 & 7) */}
+        {/* Tab A: Side-by-Side Plan Comparison */}
         {activeTab === 'comparison' && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {plans.map(plan => {
@@ -413,82 +417,97 @@ export const RecoveryArenaPage: React.FC = () => {
                 <div
                   key={plan.id}
                   onClick={() => setSelectedPlanId(plan.id)}
-                  className={`relative rounded-lg p-5 flex flex-col justify-between transition-all duration-150 cursor-pointer ${
+                  className={`relative rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 cursor-pointer ${
                     !plan.isFeasible
                       ? isSelected
-                        ? 'bg-slate-925 border-2 border-rose-500/90 shadow-lg ring-1 ring-rose-500/20'
-                        : 'bg-slate-950/90 border border-rose-800/60 hover:border-rose-600'
+                        ? 'bg-[#FDF0F1] border-2 border-[#E85D68] shadow-md'
+                        : 'bg-white border border-[#F7B6BC] hover:border-[#E85D68]'
                       : isSelected
-                      ? 'bg-slate-925 border-2 border-purple-500 shadow-lg ring-1 ring-purple-500/20'
-                      : 'bg-slate-950/80 border border-slate-800 hover:border-slate-700'
+                      ? 'bg-[#171917] text-[#F7F9F4] border-2 border-[#C8FF32] shadow-xl'
+                      : 'bg-white border border-[#E8EAE4] hover:border-[#C8FF32]'
                   }`}
                 >
                   {/* Card Header */}
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
-                        <span className="text-[10px] font-mono text-purple-400 uppercase tracking-wider block">
+                        <span className={`text-[10px] font-mono uppercase tracking-wider block font-semibold ${isSelected && plan.isFeasible ? 'text-[#C8FF32]' : 'text-[#777B76]'}`}>
                           {plan.strategyType}
                         </span>
-                        <h4 className="text-sm font-bold text-white leading-snug">{plan.name}</h4>
+                        <h4 className={`text-sm font-bold leading-snug ${isSelected && plan.isFeasible ? 'text-white' : 'text-[#171917]'}`}>
+                          {plan.name}
+                        </h4>
                       </div>
                       <PlanStatusBadge status={plan.status} />
                     </div>
 
-                    {/* Infeasible Plan Warning Marker (Requirement 7) */}
+                    {/* Infeasible Plan Warning Marker */}
                     {!plan.isFeasible && (
-                      <div className="mb-3 p-2 bg-rose-950/50 border border-rose-800/80 rounded flex items-center gap-2 text-rose-300 text-xs font-semibold">
-                        <AlertOctagon className="w-4 h-4 text-rose-400 shrink-0" />
+                      <div className="mb-3 p-2 bg-[#FDF0F1] border border-[#F7B6BC] rounded-xl flex items-center gap-2 text-[#9E1B26] text-xs font-semibold">
+                        <AlertOctagon className="w-4 h-4 text-[#E85D68] shrink-0" />
                         <span>INFEASIBLE PLAN — Constraint Violated</span>
                       </div>
                     )}
 
-                    {/* Quantitative Comparison Matrix (Requirement 4) */}
-                    <div className="grid grid-cols-2 gap-2 my-3 p-3 bg-slate-900/90 rounded border border-slate-800 font-mono text-xs">
+                    {/* Quantitative Comparison Matrix */}
+                    <div className={`grid grid-cols-2 gap-2 my-3 p-3 rounded-xl font-mono text-xs ${
+                      isSelected && plan.isFeasible ? 'bg-[#242824] border border-[#363B36]' : 'bg-[#F8F9F6] border border-[#E8EAE4]'
+                    }`}>
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase block">Incremental Cost</span>
-                        <span className="text-base font-bold text-white">${plan.estimatedCostUSD.toLocaleString()}</span>
+                        <span className="text-[10px] text-[#777B76] uppercase block">Incremental Cost</span>
+                        <span className={`text-base font-bold ${isSelected && plan.isFeasible ? 'text-white' : 'text-[#171917]'}`}>
+                          ${plan.estimatedCostUSD.toLocaleString()}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase block">Orders Protected</span>
-                        <span className={`text-base font-bold ${plan.isFeasible ? 'text-emerald-400' : 'text-slate-400'}`}>
+                        <span className="text-[10px] text-[#777B76] uppercase block">Orders Protected</span>
+                        <span className={`text-base font-bold ${plan.isFeasible ? (isSelected ? 'text-[#C8FF32]' : 'text-[#2E7D32]') : 'text-[#777B76]'}`}>
                           {plan.ordersProtectedCount} / {plan.totalOrdersCount}{' '}
                           <span className="text-xs font-normal">({plan.protectionRatePercent.toFixed(0)}%)</span>
                         </span>
                       </div>
-                      <div className="pt-2 border-t border-slate-800">
-                        <span className="text-[10px] text-slate-500 uppercase block">Expected Late Orders</span>
-                        <span className={`text-xs font-bold ${plan.expectedLateOrdersCount === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <div className={`pt-2 border-t ${isSelected && plan.isFeasible ? 'border-[#363B36]' : 'border-[#E8EAE4]'}`}>
+                        <span className="text-[10px] text-[#777B76] uppercase block">Expected Late Orders</span>
+                        <span className={`text-xs font-bold ${plan.expectedLateOrdersCount === 0 ? (isSelected && plan.isFeasible ? 'text-[#84E344]' : 'text-[#2E7D32]') : 'text-[#9E1B26]'}`}>
                           {plan.expectedLateOrdersCount} orders late
                         </span>
                       </div>
-                      <div className="pt-2 border-t border-slate-800">
-                        <span className="text-[10px] text-slate-500 uppercase block">Units Allocated</span>
-                        <span className="text-xs font-bold text-slate-200">{plan.unitsAllocated} units</span>
+                      <div className={`pt-2 border-t ${isSelected && plan.isFeasible ? 'border-[#363B36]' : 'border-[#E8EAE4]'}`}>
+                        <span className="text-[10px] text-[#777B76] uppercase block">Units Allocated</span>
+                        <span className={`text-xs font-bold ${isSelected && plan.isFeasible ? 'text-white' : 'text-[#171917]'}`}>
+                          {plan.unitsAllocated} units
+                        </span>
                       </div>
                     </div>
 
-                    {/* Feasibility Indicator & Exact Failed Constraint (Requirement 7) */}
+                    {/* Feasibility Indicator & Exact Failed Constraint */}
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-slate-300">Feasibility Status:</span>
+                        <span className={`font-semibold ${isSelected && plan.isFeasible ? 'text-[#A0A69D]' : 'text-[#777B76]'}`}>
+                          Feasibility Status:
+                        </span>
                         <span
                           className={`font-mono font-bold text-xs ${
-                            plan.isFeasible ? 'text-emerald-400' : 'text-rose-400'
+                            plan.isFeasible
+                              ? (isSelected ? 'text-[#C8FF32]' : 'text-[#2E7D32]')
+                              : 'text-[#9E1B26]'
                           }`}
                         >
                           {plan.isFeasible ? `Feasible (${plan.feasibilityScore}%)` : `Infeasible (${plan.feasibilityScore}%)`}
                         </span>
                       </div>
 
-                      {/* Explicit Failed Constraint Callout */}
                       {!plan.isFeasible && plan.failedConstraint ? (
-                        <div className="p-2.5 rounded bg-rose-950/60 border border-rose-800 text-rose-200 text-xs leading-relaxed font-sans">
-                          <strong className="block text-rose-400 font-mono text-[11px] mb-0.5">FAILED CONSTRAINT:</strong>
+                        <div className="p-3 rounded-xl bg-[#FDF0F1] border border-[#F7B6BC] text-[#9E1B26] text-xs leading-relaxed font-sans">
+                          <strong className="block text-[#9E1B26] font-mono text-[11px] mb-0.5">FAILED CONSTRAINT:</strong>
                           {plan.failedConstraint}
                         </div>
                       ) : (
-                        <div className="p-2.5 rounded bg-emerald-950/20 border border-emerald-900/40 text-emerald-200/90 text-xs leading-relaxed font-sans">
+                        <div className={`p-3 rounded-xl text-xs leading-relaxed font-sans ${
+                          isSelected && plan.isFeasible
+                            ? 'bg-[#242824] text-[#D1D6CB] border border-[#363B36]'
+                            : 'bg-[#EBF9E4] text-[#1D5E0A] border border-[#C5EAB5]'
+                        }`}>
                           {plan.feasibilityReason}
                         </div>
                       )}
@@ -496,29 +515,37 @@ export const RecoveryArenaPage: React.FC = () => {
                   </div>
 
                   {/* Actions Toolbar */}
-                  <div className="pt-3 mt-3 border-t border-slate-800 space-y-2">
+                  <div className={`pt-3 mt-3 border-t space-y-2 ${isSelected && plan.isFeasible ? 'border-[#363B36]' : 'border-[#E8EAE4]'}`}>
                     <div className="flex items-center gap-2">
-                      {/* Simulation Preview Button (Requirement 8) */}
+                      {/* Preview Button */}
                       <button
                         onClick={e => {
                           e.stopPropagation();
                           setPreviewPlan(plan);
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-medium transition-colors"
+                        className={`flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                          isSelected && plan.isFeasible
+                            ? 'bg-[#242824] hover:bg-[#2F342F] text-white border border-[#3D443D]'
+                            : 'btn-secondary'
+                        }`}
                       >
-                        <Eye className="w-3 h-3 text-sky-400" />
-                        <span>Preview Simulation</span>
+                        <Eye className="w-3.5 h-3.5 text-[#7185FF]" />
+                        <span>Preview</span>
                       </button>
 
-                      {/* Simulate Button (Requirement 9: opens confirmation) */}
+                      {/* Simulate Button */}
                       <button
                         onClick={e => {
                           e.stopPropagation();
                           handleRequestSimulation(plan);
                         }}
-                        className="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-800/60 rounded text-xs font-medium transition-colors"
+                        className={`inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                          isSelected && plan.isFeasible
+                            ? 'bg-[#C8FF32] hover:bg-[#DFFF83] text-[#080908]'
+                            : 'btn-dark'
+                        }`}
                       >
-                        <Play className="w-3 h-3 text-purple-400" />
+                        <Play className="w-3.5 h-3.5" />
                         <span>{plan.status === 'simulated' ? 'Re-Simulate' : 'Simulate'}</span>
                       </button>
 
@@ -528,14 +555,18 @@ export const RecoveryArenaPage: React.FC = () => {
                           e.stopPropagation();
                           handleOpenModify(plan);
                         }}
-                        className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition-colors"
+                        className={`p-1.5 rounded-xl text-xs transition-colors ${
+                          isSelected && plan.isFeasible
+                            ? 'bg-[#242824] hover:bg-[#2F342F] text-white border border-[#3D443D]'
+                            : 'btn-secondary'
+                        }`}
                         title="Modify parameters"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    {/* Submit for Approval Button (Requirement 10) */}
+                    {/* Submit for Approval Button */}
                     {plan.status !== 'approved' && plan.status !== 'executed' && plan.status !== 'submitted' && (
                       <button
                         disabled={!plan.isFeasible}
@@ -544,16 +575,16 @@ export const RecoveryArenaPage: React.FC = () => {
                           setSelectedPlanId(plan.id);
                           setIsApprovalModalOpen(true);
                         }}
-                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="w-full btn-lime py-2 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <Send className="w-3 h-3" />
+                        <Send className="w-3.5 h-3.5" />
                         <span>Submit for Approval</span>
                       </button>
                     )}
 
                     {/* Pending state */}
                     {plan.status === 'submitted' && (
-                      <div className="w-full p-1.5 bg-amber-950/40 border border-amber-800/60 rounded text-center text-xs text-amber-300 font-medium">
+                      <div className="w-full p-2 bg-[#FEF6E4] border border-[#F9DC9B] rounded-xl text-center text-xs text-[#805400] font-semibold">
                         Pending Manager Authorization
                       </div>
                     )}
@@ -565,16 +596,16 @@ export const RecoveryArenaPage: React.FC = () => {
                           e.stopPropagation();
                           handleExecute(plan);
                         }}
-                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold transition-colors"
+                        className="w-full btn-lime py-2 text-xs font-bold"
                       >
-                        <CheckCheck className="w-3.5 h-3.5" />
+                        <CheckCheck className="w-4 h-4" />
                         <span>Execute Plan (Dispatch EDI 204)</span>
                       </button>
                     )}
 
                     {plan.status === 'executed' && (
-                      <div className="w-full p-1.5 bg-purple-950/70 border border-purple-700/60 rounded text-center text-xs text-purple-200 font-medium">
-                        ✓ Dispatched & Active
+                      <div className="w-full p-2 bg-[#EBF9E4] border border-[#C5EAB5] rounded-xl text-center text-xs text-[#1D5E0A] font-bold">
+                        ✓ Dispatched &amp; Active
                       </div>
                     )}
                   </div>
@@ -584,13 +615,13 @@ export const RecoveryArenaPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab B: Detailed Allocation Table for Each Plan (Requirement 5) */}
+        {/* Tab B: Detailed Allocation Table */}
         {activeTab === 'allocation' && selectedPlan && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-slate-950 rounded border border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4]">
               <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono">Viewing Order Allocation For:</span>
-                <div className="text-xs font-bold text-white flex items-center gap-2">
+                <span className="text-[10px] text-[#777B76] uppercase font-mono font-medium">Viewing Order Allocation For:</span>
+                <div className="text-sm font-bold text-[#171917] flex items-center gap-2 mt-0.5">
                   <span>{selectedPlan.name}</span>
                   <PlanStatusBadge status={selectedPlan.status} />
                 </div>
@@ -598,11 +629,11 @@ export const RecoveryArenaPage: React.FC = () => {
 
               {/* Selector to switch plan */}
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-slate-400">Switch Plan:</span>
+                <span className="text-[#777B76] font-medium">Switch Plan:</span>
                 <select
                   value={selectedPlan.id}
                   onChange={e => setSelectedPlanId(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-white"
+                  className="bg-white border border-[#E8EAE4] rounded-xl px-3 py-1.5 text-xs text-[#171917] font-medium"
                 >
                   {plans.map(p => (
                     <option key={p.id} value={p.id}>
@@ -614,70 +645,70 @@ export const RecoveryArenaPage: React.FC = () => {
             </div>
 
             {/* Allocation Table */}
-            <div className="overflow-x-auto border border-slate-800 rounded-lg">
+            <div className="overflow-x-auto border border-[#E8EAE4] rounded-2xl">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950/90 text-slate-400 font-medium border-b border-slate-800">
+                <thead className="bg-[#F8F9F6] text-[#777B76] font-semibold border-b border-[#E8EAE4]">
                   <tr>
-                    <th className="py-2.5 px-3">Order ID & Customer</th>
-                    <th className="py-2.5 px-3">SKU</th>
-                    <th className="py-2.5 px-3 text-right">Order Qty</th>
-                    <th className="py-2.5 px-3 text-right">Allocated Qty</th>
-                    <th className="py-2.5 px-3 text-right">Fulfillment</th>
-                    <th className="py-2.5 px-3">Source Warehouse Pool</th>
-                    <th className="py-2.5 px-3 text-right">Stock (Before → After)</th>
-                    <th className="py-2.5 px-3 text-right">Transit Lead</th>
-                    <th className="py-2.5 px-3 text-right">SLA Breach Window</th>
-                    <th className="py-2.5 px-3">Order Outcome</th>
+                    <th className="py-3 px-3.5">Order ID & Customer</th>
+                    <th className="py-3 px-3.5">SKU</th>
+                    <th className="py-3 px-3.5 text-right">Order Qty</th>
+                    <th className="py-3 px-3.5 text-right">Allocated Qty</th>
+                    <th className="py-3 px-3.5 text-right">Fulfillment</th>
+                    <th className="py-3 px-3.5">Source Warehouse Pool</th>
+                    <th className="py-3 px-3.5 text-right">Stock (Before → After)</th>
+                    <th className="py-3 px-3.5 text-right">Transit Lead</th>
+                    <th className="py-3 px-3.5 text-right">SLA Breach Window</th>
+                    <th className="py-3 px-3.5">Order Outcome</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 font-mono">
+                <tbody className="divide-y divide-[#E8EAE4] font-mono">
                   {selectedPlan.orderAllocations && selectedPlan.orderAllocations.length > 0 ? (
                     selectedPlan.orderAllocations.map(alloc => (
-                      <tr key={alloc.orderId} className="hover:bg-slate-850/60 transition-colors">
-                        <td className="py-2.5 px-3">
-                          <div className="font-semibold text-white">{alloc.orderId}</div>
-                          <div className="text-[11px] text-slate-300 font-sans">{alloc.customerName}</div>
+                      <tr key={alloc.orderId} className="hover:bg-[#F8F9F6] transition-colors">
+                        <td className="py-3 px-3.5">
+                          <div className="font-bold text-[#171917]">{alloc.orderId}</div>
+                          <div className="text-[11px] text-[#777B76] font-sans">{alloc.customerName}</div>
                         </td>
-                        <td className="py-2.5 px-3 text-slate-300 font-bold">{alloc.sku}</td>
-                        <td className="py-2.5 px-3 text-right text-slate-300 tabular-nums">
+                        <td className="py-3 px-3.5 text-[#171917] font-bold">{alloc.sku}</td>
+                        <td className="py-3 px-3.5 text-right text-[#777B76] tabular-nums">
                           {alloc.orderQuantity}
                         </td>
-                        <td className="py-2.5 px-3 text-right text-white font-bold tabular-nums">
+                        <td className="py-3 px-3.5 text-right text-[#171917] font-bold tabular-nums">
                           {alloc.allocatedQuantity}
                         </td>
-                        <td className="py-2.5 px-3 text-right tabular-nums">
-                          <span className={alloc.fulfillmentPercent === 100 ? 'text-emerald-400 font-bold' : alloc.fulfillmentPercent > 0 ? 'text-amber-400' : 'text-rose-400'}>
+                        <td className="py-3 px-3.5 text-right tabular-nums">
+                          <span className={alloc.fulfillmentPercent === 100 ? 'text-[#2E7D32] font-bold' : alloc.fulfillmentPercent > 0 ? 'text-[#805400]' : 'text-[#9E1B26]'}>
                             {alloc.fulfillmentPercent.toFixed(1)}%
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 font-sans text-slate-300 text-[11px]">
+                        <td className="py-3 px-3.5 font-sans text-[#171917] text-[11px]">
                           {alloc.sourceWarehouseName} ({alloc.sourceWarehouseId})
                         </td>
-                        <td className="py-2.5 px-3 text-right tabular-nums text-slate-400 text-[11px]">
-                          {alloc.sourceAvailableBefore} → <strong className="text-white">{alloc.sourceRemainingAfter}</strong>
+                        <td className="py-3 px-3.5 text-right tabular-nums text-[#777B76] text-[11px]">
+                          {alloc.sourceAvailableBefore} → <strong className="text-[#171917]">{alloc.sourceRemainingAfter}</strong>
                         </td>
-                        <td className="py-2.5 px-3 text-right text-slate-200 tabular-nums">
+                        <td className="py-3 px-3.5 text-right text-[#171917] tabular-nums">
                           {alloc.leadTimeHours}h
                         </td>
-                        <td className="py-2.5 px-3 text-right tabular-nums text-slate-400">
+                        <td className="py-3 px-3.5 text-right tabular-nums text-[#777B76]">
                           {alloc.hoursUntilBreach}h
                         </td>
-                        <td className="py-2.5 px-3 font-sans">
+                        <td className="py-3 px-3.5 font-sans">
                           {alloc.outcomeStatus === 'protected_on_time' && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/60">
-                              <CheckCircle2 className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#1D5E0A] font-semibold bg-[#EBF9E4] px-2.5 py-0.5 rounded-full border border-[#C5EAB5]">
+                              <CheckCircle2 className="w-3 h-3 text-[#2E7D32]" />
                               <span>Protected On-Time</span>
                             </span>
                           )}
                           {alloc.outcomeStatus === 'partial_delay' && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-amber-400 font-semibold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/60">
-                              <Clock className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#805400] font-semibold bg-[#FEF6E4] px-2.5 py-0.5 rounded-full border border-[#F9DC9B]">
+                              <Clock className="w-3 h-3 text-[#B78103]" />
                               <span>Partial ({alloc.latenessHours}h late)</span>
                             </span>
                           )}
                           {alloc.outcomeStatus === 'late_breached' && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-rose-400 font-semibold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/60">
-                              <XCircle className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#9E1B26] font-semibold bg-[#FDF0F1] px-2.5 py-0.5 rounded-full border border-[#F7B6BC]">
+                              <XCircle className="w-3 h-3 text-[#C62828]" />
                               <span>Breached (+{alloc.latenessHours}h)</span>
                             </span>
                           )}
@@ -686,7 +717,7 @@ export const RecoveryArenaPage: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={10} className="py-6 text-center text-slate-500 font-sans">
+                      <td colSpan={10} className="py-6 text-center text-[#777B76] font-sans">
                         No order allocation records mapped for this plan.
                       </td>
                     </tr>
@@ -695,28 +726,28 @@ export const RecoveryArenaPage: React.FC = () => {
               </table>
             </div>
 
-            <div className="p-3 bg-slate-950 rounded border border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+            <div className="p-3.5 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4] text-[11px] text-[#777B76] flex items-center justify-between">
               <span>* Deterministic Stock Allocation Rule: Zero double-allocation. Warehouse stock pool is decremented sequentially per priority order.</span>
-              <span className="font-mono text-slate-300">Total Units Allocated: {selectedPlan.unitsAllocated} units</span>
+              <span className="font-mono font-bold text-[#171917]">Total Units Allocated: {selectedPlan.unitsAllocated} units</span>
             </div>
           </div>
         )}
 
-        {/* Tab C: Explaining Assumptions & Constraints Behind Results (Requirements 6 & 7) */}
+        {/* Tab C: Explaining Assumptions & Constraints Behind Results */}
         {activeTab === 'constraints' && selectedPlan && (
           <div className="space-y-6 text-xs">
             {/* Header info */}
-            <div className="p-3 bg-slate-950 rounded border border-slate-800 flex items-center justify-between">
+            <div className="p-3.5 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4] flex items-center justify-between">
               <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono">Plan Evaluated:</span>
-                <div className="text-xs font-bold text-white">{selectedPlan.name}</div>
+                <span className="text-[10px] text-[#777B76] uppercase font-mono font-medium">Plan Evaluated:</span>
+                <div className="text-sm font-bold text-[#171917]">{selectedPlan.name}</div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400">Select:</span>
+                <span className="text-[#777B76] font-medium">Select:</span>
                 <select
                   value={selectedPlan.id}
                   onChange={e => setSelectedPlanId(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-white"
+                  className="bg-white border border-[#E8EAE4] rounded-xl px-3 py-1.5 text-xs text-[#171917] font-medium"
                 >
                   {plans.map(p => (
                     <option key={p.id} value={p.id}>
@@ -728,61 +759,61 @@ export const RecoveryArenaPage: React.FC = () => {
             </div>
 
             {/* Assumptions List */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-                <FileCheck2 className="w-3.5 h-3.5 text-purple-400" />
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-[#171917]" />
                 <span>Deterministic Operational Assumptions</span>
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {selectedPlan.assumptions?.map((assump, idx) => (
-                  <div key={idx} className="p-3 bg-slate-950 rounded border border-slate-800/80 flex items-start gap-2.5">
-                    <span className="w-4 h-4 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                  <div key={idx} className="p-3.5 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4] flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-[#171917] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
-                    <span className="text-slate-300 leading-relaxed font-sans">{assump}</span>
+                    <span className="text-[#171917] leading-relaxed font-sans">{assump}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Constraints Verification Matrix (Requirement 6 & 7) */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-                <Shield className="w-3.5 h-3.5 text-sky-400" />
+            {/* Constraints Verification Matrix */}
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#7185FF]" />
                 <span>Constraints Verification Matrix (Pass / Fail)</span>
               </h4>
 
-              <div className="overflow-x-auto border border-slate-800 rounded-lg">
+              <div className="overflow-x-auto border border-[#E8EAE4] rounded-2xl">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-950/90 text-slate-400 font-medium border-b border-slate-800">
+                  <thead className="bg-[#F8F9F6] text-[#777B76] font-semibold border-b border-[#E8EAE4]">
                     <tr>
-                      <th className="py-2.5 px-3">Constraint Rule</th>
-                      <th className="py-2.5 px-3">Required Threshold</th>
-                      <th className="py-2.5 px-3">Actual Measured Value</th>
-                      <th className="py-2.5 px-3 text-center">Status</th>
-                      <th className="py-2.5 px-3">Verification Details</th>
+                      <th className="py-3 px-3.5">Constraint Rule</th>
+                      <th className="py-3 px-3.5">Required Threshold</th>
+                      <th className="py-3 px-3.5">Actual Measured Value</th>
+                      <th className="py-3 px-3.5 text-center">Status</th>
+                      <th className="py-3 px-3.5">Verification Details</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-[#E8EAE4] font-mono">
                     {selectedPlan.constraints?.map(c => (
-                      <tr key={c.id} className="hover:bg-slate-850/60 transition-colors">
-                        <td className="py-2.5 px-3 font-semibold text-white font-sans">{c.name}</td>
-                        <td className="py-2.5 px-3 text-slate-400">{c.required}</td>
-                        <td className="py-2.5 px-3 text-slate-200">{c.actual}</td>
-                        <td className="py-2.5 px-3 text-center">
+                      <tr key={c.id} className="hover:bg-[#F8F9F6] transition-colors">
+                        <td className="py-3 px-3.5 font-bold text-[#171917] font-sans">{c.name}</td>
+                        <td className="py-3 px-3.5 text-[#777B76]">{c.required}</td>
+                        <td className="py-3 px-3.5 text-[#171917] font-semibold">{c.actual}</td>
+                        <td className="py-3 px-3.5 text-center">
                           {c.passed ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/60 font-semibold font-sans">
-                              <Check className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#1D5E0A] bg-[#EBF9E4] px-2.5 py-0.5 rounded-full border border-[#C5EAB5] font-bold font-sans">
+                              <Check className="w-3.5 h-3.5 text-[#2E7D32]" />
                               <span>PASSED</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/60 font-semibold font-sans">
-                              <XCircle className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-[#9E1B26] bg-[#FDF0F1] px-2.5 py-0.5 rounded-full border border-[#F7B6BC] font-bold font-sans">
+                              <XCircle className="w-3.5 h-3.5 text-[#C62828]" />
                               <span>FAILED</span>
                             </span>
                           )}
                         </td>
-                        <td className="py-2.5 px-3 font-sans text-[11px] text-slate-300">
+                        <td className="py-3 px-3.5 font-sans text-[11px] text-[#777B76]">
                           {c.failureDetail || 'Constraint satisfied within allowable tolerance bounds.'}
                         </td>
                       </tr>
@@ -797,23 +828,23 @@ export const RecoveryArenaPage: React.FC = () => {
 
       {/* --- MODALS & DRAWERS --- */}
 
-      {/* Requirement 9: Explicit Confirmation Before Changing a Simulated State */}
+      {/* Simulation Confirmation Modal */}
       <Modal
         isOpen={!!planToSimulate}
         onClose={() => setPlanToSimulate(null)}
         title="Confirm Simulation Execution"
-        subtitle={`DisruptionIQ Deterministic Routing Engine · Target: ${planToSimulate?.name}`}
+        subtitle={`Deterministic Modeling Engine · Target: ${planToSimulate?.name}`}
         actions={
           <>
             <button
               onClick={() => setPlanToSimulate(null)}
-              className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition-colors"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmSimulation}
-              className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+              className="btn-lime"
             >
               <Play className="w-3.5 h-3.5" />
               <span>Confirm & Run Simulation</span>
@@ -822,24 +853,24 @@ export const RecoveryArenaPage: React.FC = () => {
         }
       >
         <div className="space-y-4 text-xs">
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded font-mono text-slate-300 space-y-1">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl font-mono text-[#171917] space-y-1.5">
             <div className="flex justify-between">
-              <span className="text-slate-400">Plan:</span>
-              <strong className="text-white">{planToSimulate?.name}</strong>
+              <span className="text-[#777B76]">Plan:</span>
+              <strong className="text-[#171917]">{planToSimulate?.name}</strong>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Current Status:</span>
-              <span className="capitalize text-amber-400">{planToSimulate?.status}</span>
+              <span className="text-[#777B76]">Current Status:</span>
+              <span className="capitalize text-[#805400] font-bold">{planToSimulate?.status}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Target State:</span>
-              <strong className="text-purple-300">Simulated</strong>
+              <span className="text-[#777B76]">Target State:</span>
+              <strong className="text-[#171917] bg-[#F0FFCC] px-2 py-0.5 rounded border border-[#C8FF32]">Simulated</strong>
             </div>
           </div>
 
-          <div className="p-3 bg-purple-950/30 border border-purple-800/40 rounded text-slate-300 text-xs leading-relaxed space-y-2">
-            <p className="font-semibold text-white">What this confirmation does:</p>
-            <ul className="list-disc pl-4 space-y-1 text-slate-300 text-[11px]">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl text-[#171917] text-xs leading-relaxed space-y-2">
+            <p className="font-bold text-[#171917]">What this confirmation does:</p>
+            <ul className="list-disc pl-4 space-y-1 text-[#777B76] text-[11px]">
               <li>Runs deterministic route lead-time verification against real carrier schedules.</li>
               <li>Calculates order-by-order stock allocation and confirms no double-allocation across SKUs.</li>
               <li>Updates affected customer order records from 'Unmitigated' to 'Candidate Plan'.</li>
@@ -849,7 +880,7 @@ export const RecoveryArenaPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Requirement 8: Plan Simulation Preview Modal / Drawer */}
+      {/* Plan Simulation Preview Drawer */}
       <Drawer
         isOpen={!!previewPlan}
         onClose={() => setPreviewPlan(null)}
@@ -858,13 +889,13 @@ export const RecoveryArenaPage: React.FC = () => {
         width="xl"
         footer={
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-slate-400">
-              Feasibility: <strong className={previewPlan?.isFeasible ? 'text-emerald-400' : 'text-rose-400'}>{previewPlan?.feasibilityScore}%</strong>
+            <span className="text-xs font-mono text-[#777B76]">
+              Feasibility: <strong className={previewPlan?.isFeasible ? 'text-[#2E7D32]' : 'text-[#9E1B26]'}>{previewPlan?.feasibilityScore}%</strong>
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPreviewPlan(null)}
-                className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded text-xs hover:bg-slate-700"
+                className="btn-secondary"
               >
                 Close Preview
               </button>
@@ -875,7 +906,7 @@ export const RecoveryArenaPage: React.FC = () => {
                     setSelectedPlanId(previewPlan.id);
                     setIsApprovalModalOpen(true);
                   }}
-                  className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold"
+                  className="btn-lime"
                 >
                   Submit for Approval
                 </button>
@@ -888,9 +919,9 @@ export const RecoveryArenaPage: React.FC = () => {
           <div className="space-y-5 text-xs">
             {/* Feasibility Alert */}
             {!previewPlan.isFeasible && (
-              <div className="p-3 bg-rose-950/60 border border-rose-800 rounded text-rose-200">
-                <div className="font-bold text-rose-300 mb-1 flex items-center gap-1.5">
-                  <AlertOctagon className="w-4 h-4 text-rose-400" />
+              <div className="p-4 bg-[#FDF0F1] border border-[#F7B6BC] rounded-2xl text-[#9E1B26]">
+                <div className="font-bold mb-1 flex items-center gap-1.5">
+                  <AlertOctagon className="w-4 h-4 text-[#E85D68]" />
                   <span>Infeasible Plan Constraint Notice</span>
                 </div>
                 <p className="text-[11px] leading-relaxed">{previewPlan.failedConstraint}</p>
@@ -898,24 +929,24 @@ export const RecoveryArenaPage: React.FC = () => {
             )}
 
             {/* Financial Delta Card */}
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-3 font-mono">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider font-sans">
+            <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl space-y-3 font-mono">
+              <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider font-sans">
                 Financial Delta & Penalty Avoidance Model
               </h4>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 bg-slate-900 rounded border border-slate-800">
-                  <span className="text-[10px] text-slate-500 uppercase block">Expedite Cost</span>
-                  <span className="text-base font-bold text-white">${previewPlan.estimatedCostUSD.toLocaleString()}</span>
+              <div className="grid grid-cols-3 gap-2.5 text-center">
+                <div className="p-3 bg-white rounded-xl border border-[#E8EAE4]">
+                  <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Expedite Cost</span>
+                  <span className="text-base font-bold text-[#171917]">${previewPlan.estimatedCostUSD.toLocaleString()}</span>
                 </div>
-                <div className="p-2 bg-slate-900 rounded border border-slate-800">
-                  <span className="text-[10px] text-slate-500 uppercase block">Penalty Avoided</span>
-                  <span className="text-base font-bold text-emerald-400">
+                <div className="p-3 bg-white rounded-xl border border-[#E8EAE4]">
+                  <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Penalty Avoided</span>
+                  <span className="text-base font-bold text-[#2E7D32]">
                     ${(previewPlan.estimatedCostUSD * 4.8).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
-                <div className="p-2 bg-slate-900 rounded border border-slate-800">
-                  <span className="text-[10px] text-slate-500 uppercase block">Net Benefit</span>
-                  <span className="text-base font-bold text-sky-400">
+                <div className="p-3 bg-white rounded-xl border border-[#E8EAE4]">
+                  <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Net Benefit</span>
+                  <span className="text-base font-bold text-[#7185FF]">
                     ${(previewPlan.estimatedCostUSD * 3.8).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
@@ -924,18 +955,18 @@ export const RecoveryArenaPage: React.FC = () => {
 
             {/* Simulated Timeline & Milestones */}
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider">
                 Simulated Action Sequence
               </h4>
               <div className="space-y-2">
                 {previewPlan.actions.map((act, idx) => (
-                  <div key={act.id} className="p-3 bg-slate-950 border border-slate-800 rounded">
+                  <div key={act.id} className="p-3.5 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
                     <div className="flex justify-between font-mono text-[11px]">
-                      <span className="text-purple-300 font-semibold">Step {idx + 1}: {act.carrierOrVendor}</span>
-                      <span className="text-white">${act.costUSD.toLocaleString()}</span>
+                      <span className="text-[#171917] font-bold">Step {idx + 1}: {act.carrierOrVendor}</span>
+                      <span className="text-[#171917] font-bold">${act.costUSD.toLocaleString()}</span>
                     </div>
-                    <div className="text-slate-300 mt-1">{act.description}</div>
-                    <div className="text-[10px] text-slate-500 font-mono mt-1">
+                    <div className="text-[#777B76] mt-1">{act.description}</div>
+                    <div className="text-[10px] text-[#A0A39D] font-mono mt-1">
                       {act.originHub} → {act.destHub} · Duration: {act.estimatedHours}h
                     </div>
                   </div>
@@ -945,20 +976,20 @@ export const RecoveryArenaPage: React.FC = () => {
 
             {/* Order Impact Snapshot */}
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-white uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#171917] uppercase tracking-wider">
                 Customer Delivery Status Breakdown
               </h4>
-              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              <div className="space-y-2 max-h-48 overflow-y-auto">
                 {previewPlan.orderAllocations?.map(a => (
-                  <div key={a.orderId} className="p-2.5 bg-slate-950 border border-slate-800 rounded flex justify-between items-center">
+                  <div key={a.orderId} className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl flex justify-between items-center">
                     <div>
-                      <div className="font-semibold text-white">{a.orderId} · {a.customerName}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">
+                      <div className="font-bold text-[#171917]">{a.orderId} · {a.customerName}</div>
+                      <div className="text-[10px] text-[#777B76] font-mono">
                         Allocated: {a.allocatedQuantity}/{a.orderQuantity} ({a.fulfillmentPercent.toFixed(0)}%)
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className={`text-[11px] font-mono font-semibold ${a.outcomeStatus === 'protected_on_time' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <span className={`text-[11px] font-mono font-bold ${a.outcomeStatus === 'protected_on_time' ? 'text-[#2E7D32]' : 'text-[#9E1B26]'}`}>
                         {a.outcomeStatus === 'protected_on_time' ? 'On Time' : `Late (+${a.latenessHours}h)`}
                       </span>
                     </div>
@@ -972,17 +1003,17 @@ export const RecoveryArenaPage: React.FC = () => {
 
       {/* Progress Overlay during confirmed simulation */}
       {isSimulatingProgress && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-xs">
-          <div className="bg-slate-900 border border-purple-800/60 rounded-lg p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <div className="w-12 h-12 rounded-full bg-purple-900/60 border border-purple-500 flex items-center justify-center mx-auto animate-pulse">
-              <Zap className="w-6 h-6 text-purple-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#080908]/70 backdrop-blur-xs">
+          <div className="card-dark p-7 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-[#1C201C] border border-[#303830] flex items-center justify-center mx-auto">
+              <div className="ai-orb-glow ai-orb-animated" />
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Deterministic Operations Engine</h4>
-              <p className="text-xs text-purple-300 mt-1 font-mono">{simulationStepText}</p>
+              <h4 className="text-sm font-bold text-white">InsightOS AI Simulation</h4>
+              <p className="text-xs text-[#C8FF32] mt-1 font-mono">{simulationStepText}</p>
             </div>
-            <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-purple-500 h-full w-2/3 animate-pulse rounded-full" />
+            <div className="w-full bg-[#242824] h-2 rounded-full overflow-hidden">
+              <div className="bg-[#C8FF32] h-full w-2/3 animate-pulse rounded-full shadow-[0_0_10px_#C8FF32]" />
             </div>
           </div>
         </div>
@@ -993,18 +1024,18 @@ export const RecoveryArenaPage: React.FC = () => {
         isOpen={isModifyModalOpen}
         onClose={() => setIsModifyModalOpen(false)}
         title={`Request Plan Modification: ${selectedPlan?.name}`}
-        subtitle="The current backend records the requested adjustments and returns the plan for revision."
+        subtitle="The connected backend records the requested adjustments and returns the plan for revision."
         actions={
           <>
             <button
               onClick={() => setIsModifyModalOpen(false)}
-              className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded text-xs hover:bg-slate-700"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveModification}
-              className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold"
+              className="btn-lime"
             >
               Confirm Modification Request
             </button>
@@ -1013,84 +1044,86 @@ export const RecoveryArenaPage: React.FC = () => {
       >
         <div className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Requested Units for Review</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Requested Units for Review</label>
             <input
               type="number"
               value={modifyUnits}
               onChange={e => setModifyUnits(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2.5 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50"
             />
-            <p className="text-[11px] text-slate-500 mt-1">Available buffer in candidate hub: 480 units</p>
+            <p className="text-[11px] text-[#777B76] mt-1">Available buffer in candidate hub: 480 units</p>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Requested Cost for Review ($USD)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Requested Cost for Review ($USD)</label>
             <input
               type="number"
               value={modifyCost}
               onChange={e => setModifyCost(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-white font-mono focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2.5 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50"
             />
-            <p className="text-[11px] text-slate-500 mt-1">Includes air charter surcharge and customs handling.</p>
+            <p className="text-[11px] text-[#777B76] mt-1">Includes air charter surcharge and customs handling.</p>
           </div>
         </div>
       </Modal>
 
-      {/* Requirement 10: Submit for Approval Modal */}
+      {/* Submit for Approval Modal */}
       <Modal
         isOpen={isApprovalModalOpen}
         onClose={() => setIsApprovalModalOpen(false)}
         title={`Submit ${selectedPlan?.name} for Manager Approval`}
-        subtitle={`Required authorization authority based on estimated cost ($${selectedPlan?.estimatedCostUSD.toLocaleString()}): Supply Chain Director / Operations Manager`}
+        subtitle={`Required authorization authority: $${selectedPlan?.estimatedCostUSD.toLocaleString()} expenditure budget.`}
         actions={
           <>
             <button
               onClick={() => setIsApprovalModalOpen(false)}
-              className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded text-xs hover:bg-slate-700"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmitForApproval}
-              className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold"
+              className="btn-lime"
             >
-              Confirm & Submit Request
+              Confirm &amp; Submit Request
             </button>
           </>
         }
       >
         <div className="space-y-4 text-xs">
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded font-mono space-y-1">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl font-mono space-y-1.5">
             <div className="flex justify-between">
-              <span className="text-slate-400">Disruption Reference:</span>
-              <span className="text-white font-bold">{activeDisruption?.id}</span>
+              <span className="text-[#777B76]">Disruption Reference:</span>
+              <span className="text-[#171917] font-bold">{activeDisruption?.id}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Total Expenditure:</span>
-              <span className="text-white font-bold">${selectedPlan?.estimatedCostUSD.toLocaleString()}</span>
+              <span className="text-[#777B76]">Total Expenditure:</span>
+              <span className="text-[#171917] font-bold">${selectedPlan?.estimatedCostUSD.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Customer Orders Protected:</span>
-              <span className="text-emerald-400 font-bold">{selectedPlan?.ordersProtectedCount} customer SLAs</span>
+              <span className="text-[#777B76]">Customer Orders Protected:</span>
+              <span className="text-[#2E7D32] font-bold">{selectedPlan?.ordersProtectedCount} customer SLAs</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Expected Late Orders:</span>
-              <span className="text-slate-300 font-bold">{selectedPlan?.expectedLateOrdersCount} orders</span>
+              <span className="text-[#777B76]">Expected Late Orders:</span>
+              <span className="text-[#171917] font-bold">{selectedPlan?.expectedLateOrdersCount} orders</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Requester Persona:</span>
-              <span className="text-slate-200">{currentUser.name} ({currentUser.roleLabel})</span>
+              <span className="text-[#777B76]">Requester Persona:</span>
+              <span className="text-[#171917] font-semibold">{currentUser.name} ({currentUser.roleLabel})</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Operational Justification & Risk Rationale</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">
+              Operational Justification & Risk Rationale
+            </label>
             <textarea
               rows={3}
               value={justificationNotes}
               onChange={e => setJustificationNotes(e.target.value)}
-              placeholder="e.g., Fulfills AeroTech Systems P1 order without assembly line stoppage. Penalty avoided is $145,000 against a $24,500 expedite budget."
-              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white text-xs focus:outline-none focus:border-purple-500"
+              placeholder="e.g. Fulfills P1 order without assembly line stoppage. Penalty avoided is $145,000 against a $24,500 expedite budget."
+              className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl p-3 text-[#171917] text-xs focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50"
             />
           </div>
         </div>

@@ -8,6 +8,7 @@ interface StatCardProps {
   trendType?: 'positive' | 'negative' | 'neutral';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
+  variant?: 'light' | 'dark' | 'lime';
   onClick?: () => void;
 }
 
@@ -19,38 +20,81 @@ export const StatCard: React.FC<StatCardProps> = ({
   trendType = 'neutral',
   icon,
   badge,
+  variant = 'light',
   onClick,
 }) => {
+  if (variant === 'dark') {
+    return (
+      <div
+        onClick={onClick}
+        className={`card-dark p-5 transition-all duration-200 ${
+          onClick ? 'cursor-pointer hover:border-[#3D443D] hover:shadow-lg' : ''
+        }`}
+      >
+        <div className="flex items-center justify-between text-[#8E948C] mb-3">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0A69E]">{label}</span>
+          {icon && <div className="text-[#A0A69E] bg-[#242624] p-2 rounded-xl border border-[#333733]">{icon}</div>}
+        </div>
+
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-3xl font-bold tracking-tight text-[#C8FF32] font-mono tabular-nums">
+            {value}
+          </div>
+          {badge}
+        </div>
+
+        {(subValue || trend) && (
+          <div className="mt-3 pt-3 border-t border-[#2A2E2A] flex items-center justify-between text-xs">
+            {subValue && <span className="text-[#8E948C] truncate">{subValue}</span>}
+            {trend && (
+              <span
+                className={`font-mono tabular-nums font-medium ${
+                  trendType === 'positive'
+                    ? 'text-[#84E344]'
+                    : trendType === 'negative'
+                    ? 'text-[#E85D68]'
+                    : 'text-[#A0A69E]'
+                }`}
+              >
+                {trend}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       onClick={onClick}
-      className={`bg-slate-900/90 border border-slate-800 rounded-lg p-4 transition-all duration-150 ${
-        onClick ? 'cursor-pointer hover:border-slate-700 hover:bg-slate-900' : ''
+      className={`card-light p-5 transition-all duration-200 ${
+        onClick ? 'cursor-pointer hover:border-[#D1D6CB] hover:shadow-md hover:-translate-y-0.5' : ''
       }`}
     >
-      <div className="flex items-center justify-between text-slate-400 mb-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</span>
-        {icon && <div className="text-slate-400">{icon}</div>}
+      <div className="flex items-center justify-between text-[#777B76] mb-3">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#777B76]">{label}</span>
+        {icon && <div className="text-[#777B76] bg-[#F8F9F6] p-2 rounded-xl border border-[#E8EAE4]">{icon}</div>}
       </div>
 
       <div className="flex items-baseline justify-between gap-2">
-        <div className="text-2xl font-bold tracking-tight text-white font-mono tabular-nums">
+        <div className="text-3xl font-bold tracking-tight text-[#171917] font-mono tabular-nums">
           {value}
         </div>
         {badge}
       </div>
 
       {(subValue || trend) && (
-        <div className="mt-2 flex items-center justify-between text-xs">
-          {subValue && <span className="text-slate-400 truncate">{subValue}</span>}
+        <div className="mt-3 pt-3 border-t border-[#F0F1EE] flex items-center justify-between text-xs">
+          {subValue && <span className="text-[#777B76] truncate">{subValue}</span>}
           {trend && (
             <span
-              className={`font-mono tabular-nums ${
+              className={`font-mono tabular-nums font-semibold ${
                 trendType === 'positive'
-                  ? 'text-emerald-400'
+                  ? 'text-[#2E7D32]'
                   : trendType === 'negative'
-                  ? 'text-rose-400'
-                  : 'text-slate-400'
+                  ? 'text-[#D32F2F]'
+                  : 'text-[#777B76]'
               }`}
             >
               {trend}

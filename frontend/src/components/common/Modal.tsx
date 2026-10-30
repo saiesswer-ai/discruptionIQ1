@@ -43,21 +43,21 @@ export const Modal: React.FC<ModalProps> = ({
   }[maxWidth];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080908]/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className={`w-full ${maxWidthClass} bg-slate-900 border border-slate-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden`}
+        className={`w-full ${maxWidthClass} bg-white border border-[#E4E7DF] rounded-3xl shadow-[0_25px_60px_-15px_rgba(23,25,23,0.18)] flex flex-col max-h-[90vh] overflow-hidden`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F1EE] bg-[#FAFBFA]">
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            <h3 className="text-base font-semibold text-[#171917] tracking-tight">{title}</h3>
+            {subtitle && <p className="text-xs text-[#777B76] mt-0.5">{subtitle}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-[#777B76] hover:text-[#171917] hover:bg-[#F0F1EE] transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />
@@ -65,13 +65,13 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-4 text-sm text-slate-300">
+        <div className="p-6 overflow-y-auto space-y-4 text-xs text-[#171917]">
           {children}
         </div>
 
-        {/* Footer Actions */}
+        {/* Actions Footer */}
         {actions && (
-          <div className="flex items-center justify-end gap-3 px-6 py-3.5 border-t border-slate-800 bg-slate-950/40">
+          <div className="flex items-center justify-end gap-2.5 px-6 py-4 border-t border-[#F0F1EE] bg-[#FAFBFA]">
             {actions}
           </div>
         )}

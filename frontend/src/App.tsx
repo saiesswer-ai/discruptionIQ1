@@ -1,6 +1,6 @@
 /**
- * DisruptionIQ — Recovery Arena
- * Supply Chain Disruption Management Platform
+ * InsightOS — DisruptionIQ
+ * AI Supply Chain Disruption Intelligence Platform
  */
 
 import React from 'react';
@@ -55,15 +55,36 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-slate-950 overflow-hidden">
+    <div className="flex-1 flex flex-col min-w-0 bg-[#F7F8F5] overflow-hidden">
       <TopNavbar />
-      <main className="flex-1 overflow-y-auto p-6 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Only show the loading banner on the very first fetch, not on
-              subsequent background refreshes triggered by user actions. */}
-          {dataState === 'loading' && isInitialLoad && <div className="mb-4 text-xs text-sky-300 bg-sky-950/40 border border-sky-900 rounded p-3">Loading live operational data…</div>}
-          {dataState === 'error' && <div className="mb-4 flex items-center justify-between gap-3 text-xs text-rose-200 bg-rose-950/40 border border-rose-800 rounded p-3"><span>{dataError}</span><button onClick={() => refreshData()} className="px-2 py-1 rounded bg-rose-900 hover:bg-rose-800">Retry</button></div>}
-          {dataState === 'empty' && <div className="mb-4 text-xs text-slate-300 bg-slate-900 border border-slate-800 rounded p-3">The API returned no operational records.</div>}
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* First load banner */}
+          {dataState === 'loading' && isInitialLoad && (
+            <div className="p-3.5 bg-[#F0FFCC] border border-[#C8FF32] rounded-2xl text-xs text-[#2C4800] flex items-center gap-2 font-medium">
+              <span className="w-2 h-2 rounded-full bg-[#84E344] animate-ping" />
+              <span>Connecting to live operational intelligence stream…</span>
+            </div>
+          )}
+
+          {dataState === 'error' && (
+            <div className="p-3.5 bg-[#FDF0F1] border border-[#F7B6BC] rounded-2xl text-xs text-[#9E1B26] flex items-center justify-between gap-3">
+              <span className="font-medium">{dataError}</span>
+              <button
+                onClick={() => refreshData()}
+                className="px-3 py-1 rounded-xl bg-[#9E1B26] text-white hover:bg-[#82141E] font-medium transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {dataState === 'empty' && (
+            <div className="p-3.5 bg-white border border-[#E8EAE4] rounded-2xl text-xs text-[#777B76]">
+              The connected API returned no operational records.
+            </div>
+          )}
+
           {renderActivePage()}
         </div>
       </main>
@@ -75,9 +96,11 @@ const MainContent: React.FC = () => {
 export default function App() {
   return (
     <AppProvider>
-      <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
-        <Sidebar />
-        <MainContent />
+      <div className="min-h-screen w-screen overflow-hidden bg-[#F0EDFF] flex flex-col md:p-2 lg:p-3 selection:bg-[#C8FF32] selection:text-[#080908]">
+        <div className="flex h-screen md:h-[calc(100vh-1rem)] lg:h-[calc(100vh-1.5rem)] w-full overflow-hidden rounded-none md:rounded-2xl lg:rounded-3xl border-0 md:border border-[#E0DCF5] shadow-[0_12px_45px_-12px_rgba(25,12,50,0.08)] bg-[#F7F8F5]">
+          <Sidebar />
+          <MainContent />
+        </div>
       </div>
     </AppProvider>
   );

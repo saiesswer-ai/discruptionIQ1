@@ -4,12 +4,8 @@ import { Badge } from '../common/Badge';
 import {
   AlertTriangle,
   Search,
-  Filter,
   ArrowRightLeft,
   CheckCircle2,
-  Package,
-  ShieldAlert,
-  ArrowUpRight,
 } from 'lucide-react';
 
 interface ShortageAnalysisViewProps {
@@ -46,39 +42,39 @@ export const ShortageAnalysisView: React.FC<ShortageAnalysisViewProps> = ({
     <div className="space-y-5">
       {/* KPI Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <span className="text-[10px] font-mono uppercase text-slate-400">Total Vulnerable Positions</span>
-          <div className="text-xl font-bold font-mono text-rose-400 mt-1">
+        <div className="card-light p-5">
+          <span className="text-[10px] font-mono uppercase text-[#777B76]">Total Vulnerable Positions</span>
+          <div className="text-2xl font-bold font-mono text-[#E85D68] mt-1 tracking-tight">
             {shortages.length} Hub Inventory Slots
           </div>
-          <div className="text-xs text-slate-400 mt-1">Positions at or below safety stock threshold</div>
+          <div className="text-xs text-[#777B76] mt-1">Positions at or below safety stock threshold</div>
         </div>
 
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <span className="text-[10px] font-mono uppercase text-slate-400">Cumulative Deficit Units</span>
-          <div className="text-xl font-bold font-mono text-amber-400 mt-1">
+        <div className="card-light p-5">
+          <span className="text-[10px] font-mono uppercase text-[#777B76]">Cumulative Deficit Units</span>
+          <div className="text-2xl font-bold font-mono text-[#F5C451] mt-1 tracking-tight">
             {totalDeficitUnits.toLocaleString()} Units
           </div>
-          <div className="text-xs text-slate-400 mt-1">Required to restore designated safety stock</div>
+          <div className="text-xs text-[#777B76] mt-1">Required to restore designated safety stock</div>
         </div>
 
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <span className="text-[10px] font-mono uppercase text-slate-400">Impacted Customer Orders</span>
-          <div className="text-xl font-bold font-mono text-purple-400 mt-1">
+        <div className="card-light p-5">
+          <span className="text-[10px] font-mono uppercase text-[#777B76]">Impacted Customer Orders</span>
+          <div className="text-2xl font-bold font-mono text-[#171917] mt-1 tracking-tight">
             {totalImpactedOrders} Active Orders
           </div>
-          <div className="text-xs text-slate-400 mt-1">Orders facing inventory fulfillment risk</div>
+          <div className="text-xs text-[#777B76] mt-1">Orders facing inventory fulfillment risk</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#E8EAE4]">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-500" />
+          <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-[#A0A39D]" />
           <input
             type="text"
             placeholder="Search SKU or description..."
-            className="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+            className="input-insight w-full pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -86,7 +82,7 @@ export const ShortageAnalysisView: React.FC<ShortageAnalysisViewProps> = ({
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <select
-            className="px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500"
+            className="input-insight"
             value={warehouseFilter}
             onChange={(e) => setWarehouseFilter(e.target.value)}
           >
@@ -99,7 +95,7 @@ export const ShortageAnalysisView: React.FC<ShortageAnalysisViewProps> = ({
           </select>
 
           <select
-            className="px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500"
+            className="input-insight"
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
           >
@@ -112,43 +108,43 @@ export const ShortageAnalysisView: React.FC<ShortageAnalysisViewProps> = ({
       </div>
 
       {/* Shortages Matrix Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+      <div className="card-light overflow-hidden">
         {filteredShortages.length === 0 ? (
-          <div className="p-8 text-center text-slate-400">
-            <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">No shortages matching criteria.</p>
-            <p className="text-xs text-slate-500 mt-1">All selected warehouse positions meet minimum buffer rules.</p>
+          <div className="p-12 text-center text-[#777B76]">
+            <CheckCircle2 className="w-10 h-10 text-[#84E344] mx-auto mb-3" />
+            <p className="text-base font-bold text-[#171917]">No shortages matching criteria.</p>
+            <p className="text-xs text-[#777B76] mt-1">All selected warehouse positions meet minimum buffer rules.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+            <table className="w-full text-left text-xs text-[#171917]">
+              <thead className="bg-[#F8F9F6] text-[#777B76] uppercase font-mono text-[10px] border-b border-[#E8EAE4]">
                 <tr>
-                  <th className="px-4 py-3">Warehouse Hub</th>
-                  <th className="px-4 py-3">SKU</th>
-                  <th className="px-4 py-3">Product Description</th>
-                  <th className="px-4 py-3 text-right">Available</th>
-                  <th className="px-4 py-3 text-right">Safety Buffer</th>
-                  <th className="px-4 py-3 text-right">Deficit</th>
-                  <th className="px-4 py-3 text-center">Severity</th>
-                  <th className="px-4 py-3 text-right">Orders at Risk</th>
-                  <th className="px-4 py-3">Recommended Mitigation</th>
-                  <th className="px-4 py-3 text-right">Action</th>
+                  <th className="px-5 py-3.5 font-semibold">Warehouse Hub</th>
+                  <th className="px-5 py-3.5 font-semibold">SKU</th>
+                  <th className="px-5 py-3.5 font-semibold">Product Description</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Available</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Safety Buffer</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Deficit</th>
+                  <th className="px-5 py-3.5 text-center font-semibold">Severity</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Orders at Risk</th>
+                  <th className="px-5 py-3.5 font-semibold">Recommended Mitigation</th>
+                  <th className="px-5 py-3.5 text-right font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-[#E8EAE4] font-mono">
                 {filteredShortages.map((item) => (
-                  <tr key={`${item.warehouseId}-${item.sku}`} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-bold text-white">{item.warehouseId}</div>
-                      <span className="text-[10px] text-slate-400 font-sans">{item.warehouseName}</span>
+                  <tr key={`${item.warehouseId}-${item.sku}`} className="hover:bg-[#F8F9F6] transition-colors">
+                    <td className="px-5 py-3.5">
+                      <div className="font-bold text-[#171917]">{item.warehouseId}</div>
+                      <span className="text-[10px] text-[#777B76] font-sans">{item.warehouseName}</span>
                     </td>
-                    <td className="px-4 py-3 font-bold text-rose-400">{item.sku}</td>
-                    <td className="px-4 py-3 font-sans text-slate-200">{item.skuDescription}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-slate-300">{item.availableUnits}</td>
-                    <td className="px-4 py-3 text-right text-amber-400">{item.safetyStockThreshold}</td>
-                    <td className="px-4 py-3 text-right font-bold text-rose-400">-{item.deficitUnits}</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-5 py-3.5 font-bold text-[#E85D68]">{item.sku}</td>
+                    <td className="px-5 py-3.5 font-sans font-medium text-[#171917]">{item.skuDescription}</td>
+                    <td className="px-5 py-3.5 text-right font-semibold text-[#171917]">{item.availableUnits.toLocaleString()}</td>
+                    <td className="px-5 py-3.5 text-right text-[#777B76]">{item.safetyStockThreshold.toLocaleString()}</td>
+                    <td className="px-5 py-3.5 text-right font-bold text-[#E85D68]">-{item.deficitUnits.toLocaleString()}</td>
+                    <td className="px-5 py-3.5 text-center font-sans">
                       <Badge
                         variant={
                           item.severity === 'critical'
@@ -161,17 +157,17 @@ export const ShortageAnalysisView: React.FC<ShortageAnalysisViewProps> = ({
                         {(item.severity || 'constrained').toUpperCase()}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-right font-semibold text-white">
+                    <td className="px-5 py-3.5 text-right font-bold text-[#171917]">
                       {item.affectedOrdersCount}
                     </td>
-                    <td className="px-4 py-3 font-sans text-slate-300 text-[11px]">
+                    <td className="px-5 py-3.5 font-sans text-[#777B76] text-[11px]">
                       {item.recommendedAction}
                     </td>
-                    <td className="px-4 py-3 text-right font-sans">
+                    <td className="px-5 py-3.5 text-right font-sans">
                       {canRequestTransfer && (
                         <button
                           onClick={() => onOpenTransfer(item.warehouseId, item.sku)}
-                          className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded text-[11px] font-semibold transition-colors flex items-center gap-1 ml-auto"
+                          className="btn-lime px-2.5 py-1 text-[11px] ml-auto"
                         >
                           <ArrowRightLeft className="w-3 h-3" />
                           Rebalance

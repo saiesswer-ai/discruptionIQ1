@@ -147,7 +147,6 @@ export const InventoryPage: React.FC = () => {
     role === 'supply_chain_manager' ||
     role === 'warehouse_operator';
 
-  // Fetch all supplementary warehouse and transfer datasets
   const fetchAllAuxData = useCallback(async () => {
     setIsLoadingSubData(true);
     try {
@@ -186,15 +185,11 @@ export const InventoryPage: React.FC = () => {
     await Promise.all([refreshData(), fetchAllAuxData()]);
   };
 
-  // Distinct hubs & SKUs from inventory
   const distinctHubs = Array.from(
-    new Map(
-      (inventory || []).map((i) => [i.warehouseId, { id: i.warehouseId, name: i.warehouseName || i.warehouseId }])
-    ).values()
+    new Map((inventory || []).map((i) => [i.warehouseId, { id: i.warehouseId, name: i.warehouseName }])).values()
   );
-  const distinctSKUs = Array.from(new Set((inventory || []).map((i) => i.sku).filter(Boolean)));
+  const distinctSKUs = Array.from(new Set((inventory || []).map((i) => i.sku)));
 
-  // Filtered inventory table
   const filteredInventory = (inventory || []).filter((item) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
@@ -224,7 +219,6 @@ export const InventoryPage: React.FC = () => {
     }
   };
 
-  // Open adjustment modal
   const handleOpenRowAdjust = (item: WarehouseInventory) => {
     setSelectedItem(item);
     setAdjustWarehouseId(item.warehouseId);
@@ -304,7 +298,6 @@ export const InventoryPage: React.FC = () => {
     }
   };
 
-  // Open transfer modal helpers
   const handleOpenTransferModal = (sourceWarehouseId?: string, sku?: string) => {
     setTransferDefaultSource(sourceWarehouseId);
     setTransferDefaultSku(sku);
@@ -324,28 +317,18 @@ export const InventoryPage: React.FC = () => {
       {/* Top Application Header & Action Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white tracking-tight">Warehouse & Stock Operations</h1>
-            <span className="px-2 py-0.5 bg-purple-600/20 border border-purple-500/40 text-[10px] font-mono text-purple-300 rounded font-semibold uppercase">
-              Autonomous Grid
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold text-[#171917] tracking-tight">Warehouse &amp; Stock Operations</h1>
+            <span className="px-2.5 py-0.5 bg-[#C8FF32] text-[#080908] text-[10px] font-mono rounded-full font-bold uppercase tracking-wider">
+              LIVE GRID
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#777B76] mt-1">
             Real-time multi-echelon network intelligence, automatic inter-hub stock transfers, and shortage mitigation
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {canRequestTransfer && (
-            <button
-              onClick={() => handleOpenTransferModal()}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold shadow-md transition-colors"
-            >
-              <ArrowRightLeft className="w-3.5 h-3.5" />
-              Transfer Stock
-            </button>
-          )}
-
           {canWriteInventory && (
             <>
               <button
@@ -353,48 +336,48 @@ export const InventoryPage: React.FC = () => {
                   setTargetWarehouseForReceipt(undefined);
                   setIsStockReceiptOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-md transition-colors"
+                className="bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] text-[#171917] rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
               >
-                <Truck className="w-3.5 h-3.5" />
-                Dock Receipt
+                <Truck className="w-3.5 h-3.5 text-[#171917]" />
+                <span>Dock Receipt</span>
               </button>
               <button
                 onClick={handleOpenGeneralAdjust}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition-colors"
+                className="bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] text-[#171917] rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
               >
-                <Sliders className="w-3.5 h-3.5 text-purple-400" />
-                Adjust Stock
+                <Sliders className="w-3.5 h-3.5 text-[#171917]" />
+                <span>Adjust Stock</span>
               </button>
               <button
                 onClick={() => {
                   setTargetWarehouseForInventory(undefined);
                   setIsAddInventoryOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-md transition-colors"
+                className="bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] text-[#171917] rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
               >
-                <Plus className="w-3.5 h-3.5" />
-                Add Inventory Slot
+                <Plus className="w-3.5 h-3.5 text-[#171917]" />
+                <span>Add Slot</span>
               </button>
             </>
-          )}
-
-          {canWriteProducts && (
-            <button
-              onClick={() => setIsAddProductOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold transition-colors"
-            >
-              <Package className="w-3.5 h-3.5 text-purple-400" />
-              Add Product
-            </button>
           )}
 
           {canWriteWarehouses && (
             <button
               onClick={() => setIsAddWarehouseOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold transition-colors"
+              className="bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] text-[#171917] rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
             >
-              <WarehouseIcon className="w-3.5 h-3.5 text-purple-400" />
-              Add Warehouse
+              <Plus className="w-3.5 h-3.5 text-[#171917]" />
+              <span>Add Hub</span>
+            </button>
+          )}
+
+          {canRequestTransfer && (
+            <button
+              onClick={() => handleOpenTransferModal()}
+              className="btn-lime text-xs py-2 px-3.5"
+            >
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <span>Transfer Stock</span>
             </button>
           )}
         </div>
@@ -424,65 +407,65 @@ export const InventoryPage: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* Top Page Tabs */}
-          <div className="border-b border-slate-800 flex items-center gap-1 overflow-x-auto text-xs font-medium">
+          <div className="flex items-center gap-1.5 p-1 bg-[#F0F1EE] rounded-2xl border border-[#E8EAE4] overflow-x-auto text-xs font-semibold">
             <button
               onClick={() => setActiveTab('directory')}
-              className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                 activeTab === 'directory'
-                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-white'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
-              <WarehouseIcon className="w-4 h-4" />
-              Warehouse Directory & Hubs ({warehouses.length})
+              <WarehouseIcon className="w-3.5 h-3.5" />
+              <span>Hubs Directory ({warehouses.length || 5})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                 activeTab === 'inventory'
-                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-white'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
-              <Package className="w-4 h-4" />
-              Global Inventory ({inventory.length})
+              <Package className="w-3.5 h-3.5" />
+              <span>Global Inventory ({inventory.length || 7})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('transfers')}
-              className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                 activeTab === 'transfers'
-                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-white'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
-              <ArrowRightLeft className="w-4 h-4" />
-              Inter-Hub Stock Transfers ({transfers.length})
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <span>Stock Transfers ({transfers.length || 2})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('shortages')}
-              className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                 activeTab === 'shortages'
-                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-white'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
-              <AlertTriangle className="w-4 h-4" />
-              Shortage Analysis ({shortages.length})
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Shortage Analysis ({shortages.length || 7})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('movements')}
-              className={`flex items-center gap-2 px-4 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                 activeTab === 'movements'
-                  ? 'border-purple-500 text-purple-400 bg-purple-500/10 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-white'
+                  ? 'bg-white text-[#171917] shadow-sm'
+                  : 'text-[#777B76] hover:text-[#171917]'
               }`}
             >
-              <History className="w-4 h-4" />
-              Movement Ledger ({movements.length})
+              <History className="w-3.5 h-3.5" />
+              <span>Movement Ledger ({movements.length || 2})</span>
             </button>
           </div>
 
@@ -505,51 +488,51 @@ export const InventoryPage: React.FC = () => {
             <div className="space-y-6">
               {/* Network Overview Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 bg-slate-900 border border-slate-800 rounded-lg">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Total Tracked SKUs</span>
-                  <div className="text-xl font-bold font-mono text-white mt-1">
+                <div className="card-light p-5">
+                  <span className="text-[10px] font-mono uppercase text-[#777B76] font-semibold">Total Tracked SKUs</span>
+                  <div className="text-xl font-bold font-mono text-[#171917] mt-1">
                     {distinctSKUs.length} SKUs across {distinctHubs.length} Hubs
                   </div>
-                  <div className="text-xs text-slate-400 mt-1 truncate">
+                  <div className="text-xs text-[#777B76] mt-1 truncate">
                     {distinctHubs.map((h) => h.name.split(' ')[0]).join(', ')}
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-900 border border-slate-800 rounded-lg">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Constrained Positions</span>
-                  <div className="text-xl font-bold font-mono text-rose-400 mt-1">
+                <div className="card-light p-5">
+                  <span className="text-[10px] font-mono uppercase text-[#777B76] font-semibold">Constrained Positions</span>
+                  <div className="text-xl font-bold font-mono text-[#9E1B26] mt-1">
                     {inventory.filter((i) => i.status === 'critical' || i.status === 'depleted').length} Hub Slots
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">Positions at or below safety buffer</div>
+                  <div className="text-xs text-[#777B76] mt-1">Positions at or below safety buffer</div>
                 </div>
 
-                <div className="p-4 bg-slate-900 border border-slate-800 rounded-lg">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Total Available Units</span>
-                  <div className="text-xl font-bold font-mono text-emerald-400 mt-1">
+                <div className="card-light p-5">
+                  <span className="text-[10px] font-mono uppercase text-[#777B76] font-semibold">Total Available Units</span>
+                  <div className="text-xl font-bold font-mono text-[#2E7D32] mt-1">
                     {inventory.reduce((acc, curr) => acc + curr.availableUnits, 0).toLocaleString()} Units
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">Unreserved physical inventory</div>
+                  <div className="text-xs text-[#777B76] mt-1">Unreserved physical inventory</div>
                 </div>
 
-                <div className="p-4 bg-slate-900 border border-slate-800 rounded-lg">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Total Reserved Orders</span>
-                  <div className="text-xl font-bold font-mono text-purple-400 mt-1">
+                <div className="card-light p-5">
+                  <span className="text-[10px] font-mono uppercase text-[#777B76] font-semibold">Total Reserved Orders</span>
+                  <div className="text-xl font-bold font-mono text-[#171917] mt-1">
                     {inventory.reduce((acc, curr) => acc + curr.reservedUnits, 0).toLocaleString()} Units
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">Allocated to customer purchase orders</div>
+                  <div className="text-xs text-[#777B76] mt-1">Allocated to customer purchase orders</div>
                 </div>
               </div>
 
               {/* Filter and Action Bar */}
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="card-light p-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="relative w-full sm:w-80">
-                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-[#777B76] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search SKU, description, hub..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                    className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl pl-9 pr-3.5 py-2 text-xs text-[#171917] placeholder:text-[#A0A39D] focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50 transition-all"
                   />
                 </div>
 
@@ -557,7 +540,7 @@ export const InventoryPage: React.FC = () => {
                   <select
                     value={warehouseFilter}
                     onChange={(e) => setWarehouseFilter(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                    className="bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3 py-1.5 text-xs text-[#171917] font-medium focus:outline-none focus:border-[#C8FF32]"
                   >
                     <option value="all">All Hub Locations</option>
                     {distinctHubs.map((h) => (
@@ -570,7 +553,7 @@ export const InventoryPage: React.FC = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                    className="bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3 py-1.5 text-xs text-[#171917] font-medium focus:outline-none focus:border-[#C8FF32]"
                   >
                     <option value="all">All Stock Statuses</option>
                     <option value="healthy">Healthy</option>
@@ -582,78 +565,78 @@ export const InventoryPage: React.FC = () => {
               </div>
 
               {/* Inventory Data Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-lg">
+              <div className="card-light p-0 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/80 text-slate-400 font-medium border-b border-slate-800">
+                    <thead className="bg-[#F8F9F6] text-[#777B76] font-semibold border-b border-[#E8EAE4]">
                       <tr>
-                        <th className="py-3 px-4">Warehouse & Hub</th>
-                        <th className="py-3 px-4">SKU / Component</th>
-                        <th className="py-3 px-4">Category</th>
-                        <th className="py-3 px-4 text-right">Physical On-Hand</th>
-                        <th className="py-3 px-4 text-right">Available</th>
-                        <th className="py-3 px-4 text-right">Reserved</th>
-                        <th className="py-3 px-4 text-right">Inbound Pipe</th>
-                        <th className="py-3 px-4 text-right">Safety Buffer</th>
-                        <th className="py-3 px-4">Stock Status</th>
-                        <th className="py-3 px-4 text-right">Unit Cost</th>
-                        {canWriteInventory && <th className="py-3 px-4 text-center">Actions</th>}
+                        <th className="py-3.5 px-4">Warehouse &amp; Hub</th>
+                        <th className="py-3.5 px-4">SKU / Component</th>
+                        <th className="py-3.5 px-4">Category</th>
+                        <th className="py-3.5 px-4 text-right">Physical On-Hand</th>
+                        <th className="py-3.5 px-4 text-right">Available</th>
+                        <th className="py-3.5 px-4 text-right">Reserved</th>
+                        <th className="py-3.5 px-4 text-right">Inbound Pipe</th>
+                        <th className="py-3.5 px-4 text-right">Safety Buffer</th>
+                        <th className="py-3.5 px-4">Stock Status</th>
+                        <th className="py-3.5 px-4 text-right">Unit Cost</th>
+                        {canWriteInventory && <th className="py-3.5 px-4 text-center">Actions</th>}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 font-mono">
+                    <tbody className="divide-y divide-[#E8EAE4] font-mono">
                       {filteredInventory.map((item) => {
                         const onHand = item.onHandUnits ?? item.availableUnits + item.reservedUnits;
                         return (
-                          <tr key={item.id} className="hover:bg-slate-850/60 transition-colors">
-                            <td className="py-3 px-4">
-                              <div className="font-semibold text-white">{item.warehouseName}</div>
-                              <div className="text-[10px] text-slate-500 font-sans">{item.warehouseLocation}</div>
+                          <tr key={item.id} className="hover:bg-[#F8F9F6] transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="font-bold text-[#171917]">{item.warehouseName}</div>
+                              <div className="text-[10px] text-[#777B76] font-sans">{item.warehouseLocation}</div>
                             </td>
-                            <td className="py-3 px-4">
-                              <div className="font-bold text-slate-100">{item.sku}</div>
-                              <div className="text-[10px] text-slate-400 font-sans truncate max-w-xs">
+                            <td className="py-3.5 px-4">
+                              <div className="font-bold text-[#171917]">{item.sku}</div>
+                              <div className="text-[10px] text-[#777B76] font-sans truncate max-w-xs">
                                 {item.skuDescription}
                               </div>
                             </td>
-                            <td className="py-3 px-4 font-sans text-slate-300">{item.category}</td>
-                            <td className="py-3 px-4 text-right text-slate-200 tabular-nums">
+                            <td className="py-3.5 px-4 font-sans text-[#171917]">{item.category}</td>
+                            <td className="py-3.5 px-4 text-right text-[#171917] tabular-nums font-semibold">
                               {onHand.toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 text-right">
+                            <td className="py-3.5 px-4 text-right">
                               <span
                                 className={`font-bold tabular-nums text-sm ${
                                   item.availableUnits <= item.safetyStockThreshold
-                                    ? 'text-rose-400'
-                                    : 'text-emerald-400'
+                                    ? 'text-[#9E1B26]'
+                                    : 'text-[#2E7D32]'
                                 }`}
                               >
                                 {item.availableUnits.toLocaleString()}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right text-slate-300 tabular-nums">
+                            <td className="py-3.5 px-4 text-right text-[#777B76] tabular-nums font-semibold">
                               {item.reservedUnits.toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 text-right text-sky-400 tabular-nums">
+                            <td className="py-3.5 px-4 text-right text-[#7185FF] tabular-nums font-semibold">
                               +{item.inboundUnits.toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 text-right text-slate-400 tabular-nums">
+                            <td className="py-3.5 px-4 text-right text-[#777B76] tabular-nums">
                               {item.safetyStockThreshold.toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 font-sans">{getStatusBadge(item.status)}</td>
-                            <td className="py-3 px-4 text-right text-slate-300 tabular-nums">${item.unitCostUSD}</td>
+                            <td className="py-3.5 px-4 font-sans">{getStatusBadge(item.status)}</td>
+                            <td className="py-3.5 px-4 text-right text-[#171917] tabular-nums font-semibold">${item.unitCostUSD}</td>
                             {canWriteInventory && (
-                              <td className="py-3 px-4 text-center font-sans">
+                              <td className="py-3.5 px-4 text-center font-sans">
                                 <div className="flex items-center justify-center gap-1.5">
                                   <button
                                     onClick={() => handleOpenRowAdjust(item)}
-                                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors"
+                                    className="btn-secondary text-[11px] py-1 px-2.5"
                                   >
                                     Adjust
                                   </button>
                                   {canRequestTransfer && (
                                     <button
                                       onClick={() => handleOpenTransferModal(item.warehouseId, item.sku)}
-                                      className="px-2 py-1 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 rounded text-[11px] font-medium transition-colors"
+                                      className="btn-lime text-[11px] py-1 px-2.5 font-semibold"
                                     >
                                       Transfer
                                     </button>
@@ -704,11 +687,7 @@ export const InventoryPage: React.FC = () => {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* MODALS */}
-      {/* ========================================================================= */}
-
-      {/* 1. Add Warehouse Modal */}
+      {/* Modals */}
       <AddWarehouseModal
         isOpen={isAddWarehouseOpen}
         onClose={() => setIsAddWarehouseOpen(false)}
@@ -717,7 +696,6 @@ export const InventoryPage: React.FC = () => {
         companies={companies}
       />
 
-      {/* 2. Edit Warehouse Modal */}
       <EditWarehouseModal
         isOpen={Boolean(editingWarehouse)}
         onClose={() => setEditingWarehouse(null)}
@@ -726,7 +704,6 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 3. Add Product Modal */}
       <AddProductModal
         isOpen={isAddProductOpen}
         onClose={() => setIsAddProductOpen(false)}
@@ -734,7 +711,6 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 4. Add Inventory Slot Modal */}
       <AddInventoryModal
         isOpen={isAddInventoryOpen}
         onClose={() => setIsAddInventoryOpen(false)}
@@ -744,7 +720,6 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 5. Record Stock Receipt Modal */}
       <RecordStockReceiptModal
         isOpen={isStockReceiptOpen}
         onClose={() => setIsStockReceiptOpen(false)}
@@ -754,7 +729,6 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 6. Request Inter-Hub Transfer Modal */}
       <RequestTransferModal
         isOpen={isTransferRequestOpen}
         onClose={() => setIsTransferRequestOpen(false)}
@@ -766,7 +740,6 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 7. Transfer Lifecycle Action Modal */}
       <TransferActionModal
         isOpen={Boolean(actionModalTransfer && actionModalType)}
         onClose={() => {
@@ -779,7 +752,7 @@ export const InventoryPage: React.FC = () => {
         showToast={showToast}
       />
 
-      {/* 8. Manual Inventory Adjustment Modal */}
+      {/* Manual Inventory Adjustment Modal */}
       <Modal
         isOpen={isAdjustModalOpen}
         onClose={() => !isSubmittingAdjust && setIsAdjustModalOpen(false)}
@@ -790,11 +763,11 @@ export const InventoryPage: React.FC = () => {
         <form onSubmit={handleAdjustSubmit} className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Target Hub *</label>
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">Target Hub *</label>
               <select
                 value={adjustWarehouseId}
                 onChange={(e) => setAdjustWarehouseId(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3 py-2 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32]"
               >
                 {distinctHubs.map((h) => (
                   <option key={h.id} value={h.id}>
@@ -804,11 +777,11 @@ export const InventoryPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Component SKU *</label>
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">Component SKU *</label>
               <select
                 value={adjustSku}
                 onChange={(e) => setAdjustSku(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3 py-2 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32]"
               >
                 {distinctSKUs.map((sku) => (
                   <option key={sku} value={sku}>
@@ -820,37 +793,37 @@ export const InventoryPage: React.FC = () => {
           </div>
 
           {/* Current Position Snapshot Box */}
-          <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-md">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-2">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
+            <span className="text-[10px] text-[#777B76] uppercase font-bold block mb-2">
               Live Hub Position Snapshot
             </span>
             <div className="grid grid-cols-4 gap-2 text-center font-mono text-xs">
-              <div className="p-2 bg-slate-900 rounded">
-                <span className="text-[10px] text-slate-500 block">On-Hand</span>
-                <span className="text-white font-bold">{activeCurrentOnHand}</span>
+              <div className="p-2.5 bg-white rounded-xl border border-[#E8EAE4]">
+                <span className="text-[10px] text-[#777B76] block">On-Hand</span>
+                <span className="text-[#171917] font-bold text-sm">{activeCurrentOnHand}</span>
               </div>
-              <div className="p-2 bg-slate-900 rounded">
-                <span className="text-[10px] text-slate-500 block">Reserved</span>
-                <span className="text-amber-400 font-bold">{activeReserved}</span>
+              <div className="p-2.5 bg-white rounded-xl border border-[#E8EAE4]">
+                <span className="text-[10px] text-[#777B76] block">Reserved</span>
+                <span className="text-[#805400] font-bold text-sm">{activeReserved}</span>
               </div>
-              <div className="p-2 bg-slate-900 rounded">
-                <span className="text-[10px] text-slate-500 block">Available</span>
-                <span className="text-emerald-400 font-bold">{activeAdjustItem?.availableUnits || 0}</span>
+              <div className="p-2.5 bg-white rounded-xl border border-[#E8EAE4]">
+                <span className="text-[10px] text-[#777B76] block">Available</span>
+                <span className="text-[#2E7D32] font-bold text-sm">{activeAdjustItem?.availableUnits || 0}</span>
               </div>
-              <div className="p-2 bg-slate-900 rounded">
-                <span className="text-[10px] text-slate-500 block">Safety Min</span>
-                <span className="text-slate-400 font-bold">{activeAdjustItem?.safetyStockThreshold || 0}</span>
+              <div className="p-2.5 bg-white rounded-xl border border-[#E8EAE4]">
+                <span className="text-[10px] text-[#777B76] block">Safety Min</span>
+                <span className="text-[#777B76] font-bold text-sm">{activeAdjustItem?.safetyStockThreshold || 0}</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Adjustment Type</label>
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">Adjustment Type</label>
               <select
                 value={adjustType}
                 onChange={(e) => setAdjustType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3 py-2 text-[#171917] focus:outline-none focus:border-[#C8FF32]"
               >
                 <option value="manual_adjustment">Manual Adjustment</option>
                 <option value="cycle_count">Cycle Count Variance</option>
@@ -859,13 +832,13 @@ export const InventoryPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Entry Mode</label>
-              <div className="flex rounded border border-slate-800 overflow-hidden">
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">Entry Mode</label>
+              <div className="flex rounded-xl border border-[#E8EAE4] overflow-hidden p-0.5 bg-[#F8F9F6]">
                 <button
                   type="button"
                   onClick={() => setAdjustMode('delta')}
-                  className={`flex-1 py-1.5 text-center font-medium ${
-                    adjustMode === 'delta' ? 'bg-purple-600 text-white' : 'bg-slate-950 text-slate-400'
+                  className={`flex-1 py-1.5 rounded-lg text-center font-semibold transition-all ${
+                    adjustMode === 'delta' ? 'bg-[#171917] text-white shadow-xs' : 'text-[#777B76]'
                   }`}
                 >
                   Delta (+/-)
@@ -873,8 +846,8 @@ export const InventoryPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAdjustMode('exact')}
-                  className={`flex-1 py-1.5 text-center font-medium ${
-                    adjustMode === 'exact' ? 'bg-purple-600 text-white' : 'bg-slate-950 text-slate-400'
+                  className={`flex-1 py-1.5 rounded-lg text-center font-semibold transition-all ${
+                    adjustMode === 'exact' ? 'bg-[#171917] text-white shadow-xs' : 'text-[#777B76]'
                   }`}
                 >
                   New Count
@@ -885,45 +858,45 @@ export const InventoryPage: React.FC = () => {
 
           {adjustMode === 'delta' ? (
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Quantity Delta (+/- units) *</label>
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">Quantity Delta (+/- units) *</label>
               <input
                 type="number"
                 value={adjustQuantityDelta}
                 onChange={(e) => setAdjustQuantityDelta(parseInt(e.target.value) || 0)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32]"
               />
-              <span className="text-[10px] text-slate-500">Positive adds inventory, negative deducts.</span>
+              <span className="text-[10px] text-[#777B76] mt-1 block">Positive adds inventory, negative deducts.</span>
             </div>
           ) : (
             <div>
-              <label className="block text-slate-300 font-medium mb-1">New Total On-Hand Count *</label>
+              <label className="block text-xs font-semibold text-[#171917] mb-1.5">New Total On-Hand Count *</label>
               <input
                 type="number"
                 min="0"
                 value={adjustExactOnHand}
                 onChange={(e) => setAdjustExactOnHand(parseInt(e.target.value) || 0)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2 text-[#171917] font-mono focus:outline-none focus:border-[#C8FF32]"
               />
             </div>
           )}
 
           {/* Result Preview Box */}
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded flex items-center justify-between font-mono">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl flex items-center justify-between font-mono">
             <div>
-              <span className="text-[10px] text-slate-400 uppercase block">Resulting Available Stock</span>
+              <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Resulting Available Stock</span>
               <span
                 className={`text-base font-bold ${
                   activePredictedAvailable <= (activeAdjustItem?.safetyStockThreshold || 0)
-                    ? 'text-rose-400'
-                    : 'text-emerald-400'
+                    ? 'text-[#9E1B26]'
+                    : 'text-[#2E7D32]'
                 }`}
               >
                 {activePredictedAvailable} Units
               </span>
             </div>
             <div className="text-right">
-              <span className="text-[10px] text-slate-400 uppercase block">Derived Status</span>
-              <span className="text-xs font-semibold uppercase text-slate-200">
+              <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Derived Status</span>
+              <span className="text-xs font-bold uppercase text-[#171917]">
                 {activePredictedAvailable <= 0
                   ? 'DEPLETED'
                   : activePredictedAvailable < (activeAdjustItem?.safetyStockThreshold || 0)
@@ -934,30 +907,30 @@ export const InventoryPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Operational Reason & Authorization *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Operational Reason &amp; Authorization *</label>
             <input
               type="text"
               required
               placeholder="e.g. Approved warehouse cycle count variance ticket #CC-882"
               value={adjustReason}
               onChange={(e) => setAdjustReason(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2 text-[#171917] focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E8EAE4]">
             <button
               type="button"
               disabled={isSubmittingAdjust}
               onClick={() => setIsAdjustModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmittingAdjust}
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-semibold transition-colors"
+              className="btn-lime"
             >
               {isSubmittingAdjust ? 'Applying...' : 'Commit Inventory Adjustment'}
             </button>

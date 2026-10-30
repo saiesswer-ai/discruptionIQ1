@@ -11,15 +11,7 @@ import {
   Ship,
   Plane,
   Search,
-  Building,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-  ExternalLink,
-  ShieldCheck,
   PlusCircle,
-  Edit,
-  AlertOctagon,
   MapPin,
 } from 'lucide-react';
 
@@ -97,11 +89,11 @@ export const ShipmentsPage: React.FC = () => {
   const getTransportIcon = (mode: string) => {
     switch (mode) {
       case 'Ocean':
-        return <Ship className="w-3.5 h-3.5 text-sky-400" />;
+        return <Ship className="w-3.5 h-3.5 text-[#7185FF]" />;
       case 'Air':
-        return <Plane className="w-3.5 h-3.5 text-purple-400" />;
+        return <Plane className="w-3.5 h-3.5 text-[#171917]" />;
       default:
-        return <Truck className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Truck className="w-3.5 h-3.5 text-[#84E344]" />;
     }
   };
 
@@ -223,25 +215,25 @@ export const ShipmentsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Tab Switcher & Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="card-light p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Interactive tabs */}
-        <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-1.5 p-1 bg-[#F0F1EE] rounded-2xl border border-[#E8EAE4]">
           <button
             onClick={() => setActiveTab('shipments')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all ${
               activeTab === 'shipments'
-                ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171917] text-[#C8FF32] shadow-sm'
+                : 'text-[#777B76] hover:text-[#171917]'
             }`}
           >
             Inbound Shipments ({shipments.length})
           </button>
           <button
             onClick={() => setActiveTab('suppliers')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all ${
               activeTab === 'suppliers'
-                ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171917] text-[#C8FF32] shadow-sm'
+                : 'text-[#777B76] hover:text-[#171917]'
             }`}
           >
             Suppliers & Performance ({suppliers.length})
@@ -251,7 +243,7 @@ export const ShipmentsPage: React.FC = () => {
         {/* Search & Actions */}
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#A0A39D] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder={
@@ -261,17 +253,17 @@ export const ShipmentsPage: React.FC = () => {
               }
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full pl-9"
             />
           </div>
 
           {activeTab === 'shipments' && canWriteShipments && (
             <button
               onClick={handleOpenRegister}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-md text-xs font-semibold transition-colors shadow-xs"
+              className="btn-lime text-xs"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              <span>+ Register Shipment</span>
+              <span>Register Shipment</span>
             </button>
           )}
         </div>
@@ -279,32 +271,32 @@ export const ShipmentsPage: React.FC = () => {
 
       {/* Tab 1: Shipments */}
       {activeTab === 'shipments' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
+        <div className="card-light overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 text-slate-400 font-medium border-b border-slate-800">
+            <table className="w-full text-left text-xs text-[#171917]">
+              <thead className="bg-[#F8F9F6] text-[#777B76] uppercase font-mono text-[10px] border-b border-[#E8EAE4]">
                 <tr>
-                  <th className="py-3 px-4">Tracking & Carrier</th>
-                  <th className="py-3 px-4">Mode</th>
-                  <th className="py-3 px-4">Origin / Destination</th>
-                  <th className="py-3 px-4">Cargo Description</th>
-                  <th className="py-3 px-4 text-right">Promised SLA</th>
-                  <th className="py-3 px-4 text-right">Estimated ETA</th>
-                  <th className="py-3 px-4 text-right">Delay</th>
-                  <th className="py-3 px-4">Status</th>
-                  {canWriteShipments && <th className="py-3 px-4 text-center">Actions</th>}
+                  <th className="py-3.5 px-5 font-semibold">Tracking & Carrier</th>
+                  <th className="py-3.5 px-5 font-semibold">Mode</th>
+                  <th className="py-3.5 px-5 font-semibold">Origin / Destination</th>
+                  <th className="py-3.5 px-5 font-semibold">Cargo Description</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Promised SLA</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Estimated ETA</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Delay</th>
+                  <th className="py-3.5 px-5 font-semibold">Status</th>
+                  {canWriteShipments && <th className="py-3.5 px-5 text-center font-semibold">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-[#E8EAE4] font-mono">
                 {filteredShipments.map(s => (
-                  <tr key={s.id} className="hover:bg-slate-850/60 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="font-semibold text-white">{s.trackingNumber}</div>
-                      <div className="text-[11px] text-slate-400 font-sans">{s.carrierName}</div>
+                  <tr key={s.id} className="hover:bg-[#F8F9F6] transition-colors">
+                    <td className="py-3.5 px-5">
+                      <div className="font-bold text-[#171917]">{s.trackingNumber}</div>
+                      <div className="text-[11px] text-[#777B76] font-sans">{s.carrierName}</div>
                     </td>
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-3.5 px-5 font-sans">
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-slate-300 shrink-0">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F0F1EE] border border-[#E8EAE4] text-[11px] font-medium text-[#171917] shrink-0">
                           {getTransportIcon(s.transportMode)}
                           <span>{s.transportMode}</span>
                         </span>
@@ -313,44 +305,44 @@ export const ShipmentsPage: React.FC = () => {
                             type="button"
                             onClick={() => setLiveTrackingShipment(s)}
                             aria-label={`View live location of ${s.trackingNumber}`}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-950/60 hover:bg-purple-900/80 border border-purple-800/60 hover:border-purple-600 text-[11px] font-medium text-purple-300 hover:text-purple-100 transition-colors cursor-pointer shrink-0"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#C8FF32]/20 hover:bg-[#C8FF32]/35 border border-[#C8FF32]/50 text-[11px] font-semibold text-[#080908] transition-all cursor-pointer shrink-0"
                           >
-                            <MapPin className="w-3 h-3 text-purple-400" />
+                            <MapPin className="w-3.5 h-3.5 text-[#080908]" />
                             <span>Live Location</span>
                           </button>
                         )}
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-sans text-slate-200 text-[11px]">
-                      <div>{s.origin}</div>
-                      <div className="text-slate-500">→ {s.destination}</div>
+                    <td className="py-3.5 px-5 font-sans text-[#171917] text-xs">
+                      <div className="font-medium">{s.origin}</div>
+                      <div className="text-[#777B76] text-[11px]">→ {s.destination}</div>
                     </td>
-                    <td className="py-3 px-4 font-sans text-slate-300 max-w-xs truncate">
+                    <td className="py-3.5 px-5 font-sans text-[#171917] max-w-xs truncate">
                       {s.cargoDescription}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-400">
+                    <td className="py-3.5 px-5 text-right text-[#777B76]">
                       {new Date(s.promisedDeliveryDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-200">
+                    <td className="py-3.5 px-5 text-right text-[#171917] font-semibold">
                       {new Date(s.estimatedDeliveryDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3.5 px-5 text-right">
                       {s.delayHours > 0 ? (
-                        <span className="text-amber-400 font-bold">+{s.delayHours}h</span>
+                        <span className="text-[#E85D68] font-bold">+{s.delayHours}h</span>
                       ) : (
-                        <span className="text-emerald-400">On Time</span>
+                        <span className="text-[#84E344] font-semibold">On Time</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-3.5 px-5 font-sans">
                       {s.status === 'delayed' && <Badge variant="critical">Delayed</Badge>}
                       {s.status === 'customs_hold' && <Badge variant="warning">Customs Hold</Badge>}
                       {s.status === 'on_schedule' && <Badge variant="success">On Schedule</Badge>}
                     </td>
                     {canWriteShipments && (
-                      <td className="py-3 px-4 text-center font-sans">
+                      <td className="py-3.5 px-5 text-center font-sans">
                         <button
                           onClick={() => handleOpenUpdate(s)}
-                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors"
+                          className="px-2.5 py-1 bg-[#F0F1EE] hover:bg-[#E8EAE4] text-[#171917] rounded-lg text-[11px] font-medium transition-colors"
                         >
                           Update ETA
                         </button>
@@ -366,62 +358,62 @@ export const ShipmentsPage: React.FC = () => {
 
       {/* Tab 2: Suppliers */}
       {activeTab === 'suppliers' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
+        <div className="card-light overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 text-slate-400 font-medium border-b border-slate-800">
+            <table className="w-full text-left text-xs text-[#171917]">
+              <thead className="bg-[#F8F9F6] text-[#777B76] uppercase font-mono text-[10px] border-b border-[#E8EAE4]">
                 <tr>
-                  <th className="py-3 px-4">Supplier Name</th>
-                  <th className="py-3 px-4">Country & Tier</th>
-                  <th className="py-3 px-4">Product Category</th>
-                  <th className="py-3 px-4 text-right">Reliability Index</th>
-                  <th className="py-3 px-4 text-right">On-Time Rate</th>
-                  <th className="py-3 px-4 text-right">Avg. Lead Time</th>
-                  <th className="py-3 px-4 text-right">Delays (90d)</th>
-                  <th className="py-3 px-4">Contract Status</th>
-                  {canWriteSuppliers && <th className="py-3 px-4 text-center">Actions</th>}
+                  <th className="py-3.5 px-5 font-semibold">Supplier Name</th>
+                  <th className="py-3.5 px-5 font-semibold">Country & Tier</th>
+                  <th className="py-3.5 px-5 font-semibold">Product Category</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Reliability Index</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">On-Time Rate</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Avg. Lead Time</th>
+                  <th className="py-3.5 px-5 text-right font-semibold">Delays (90d)</th>
+                  <th className="py-3.5 px-5 font-semibold">Contract Status</th>
+                  {canWriteSuppliers && <th className="py-3.5 px-5 text-center font-semibold">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-[#E8EAE4] font-mono">
                 {filteredSuppliers.map(sup => (
-                  <tr key={sup.id} className="hover:bg-slate-850/60 transition-colors">
-                    <td className="py-3 px-4 font-sans">
-                      <div className="font-semibold text-white">{sup.name}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">{sup.contactEmail}</div>
+                  <tr key={sup.id} className="hover:bg-[#F8F9F6] transition-colors">
+                    <td className="py-3.5 px-5 font-sans">
+                      <div className="font-semibold text-[#171917]">{sup.name}</div>
+                      <div className="text-[10px] text-[#777B76] font-mono">{sup.contactEmail}</div>
                     </td>
-                    <td className="py-3 px-4 font-sans text-slate-300">
-                      <div>{sup.country}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{sup.tier}</div>
+                    <td className="py-3.5 px-5 font-sans text-[#777B76]">
+                      <div className="text-[#171917] font-medium">{sup.country}</div>
+                      <div className="text-[10px] text-[#A0A39D] font-mono">{sup.tier}</div>
                     </td>
-                    <td className="py-3 px-4 font-sans text-slate-300">
+                    <td className="py-3.5 px-5 font-sans text-[#171917]">
                       {sup.category}
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <span className={`font-bold ${sup.reliabilityScore >= 90 ? 'text-emerald-400' : sup.reliabilityScore >= 80 ? 'text-sky-400' : 'text-amber-400'}`}>
+                    <td className="py-3.5 px-5 text-right">
+                      <span className={`font-bold ${sup.reliabilityScore >= 90 ? 'text-[#1b6b0c]' : sup.reliabilityScore >= 80 ? 'text-[#7185FF]' : 'text-[#8f6d14]'}`}>
                         {sup.reliabilityScore} / 100
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-200">
+                    <td className="py-3.5 px-5 text-right text-[#171917] font-semibold">
                       {sup.onTimeDeliveryRate}%
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-300">
+                    <td className="py-3.5 px-5 text-right text-[#777B76]">
                       {sup.averageLeadTimeDays} days
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <span className={`font-semibold ${sup.delayIncidentsLast90d > 2 ? 'text-rose-400' : 'text-slate-400'}`}>
+                    <td className="py-3.5 px-5 text-right">
+                      <span className={`font-semibold ${sup.delayIncidentsLast90d > 2 ? 'text-[#E85D68]' : 'text-[#777B76]'}`}>
                         {sup.delayIncidentsLast90d} incidents
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-sans">
+                    <td className="py-3.5 px-5 font-sans">
                       {sup.status === 'preferred' && <Badge variant="success">Preferred Vendor</Badge>}
-                      {sup.status === 'conditional' && <Badge variant="warning">Conditional / Under Review</Badge>}
+                      {sup.status === 'conditional' && <Badge variant="warning">Conditional / Review</Badge>}
                       {sup.status === 'restricted' && <Badge variant="critical">Restricted</Badge>}
                     </td>
                     {canWriteSuppliers && (
-                      <td className="py-3 px-4 text-center font-sans">
+                      <td className="py-3.5 px-5 text-center font-sans">
                         <button
                           onClick={() => handleOpenIssue(sup)}
-                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors"
+                          className="px-2.5 py-1 bg-[#F0F1EE] hover:bg-[#E8EAE4] text-[#171917] rounded-lg text-[11px] font-medium transition-colors"
                         >
                           Report Issue
                         </button>
@@ -446,34 +438,34 @@ export const ShipmentsPage: React.FC = () => {
         <form onSubmit={handleRegisterSubmit} className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Tracking Number *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Tracking Number *</label>
               <input
                 type="text"
                 required
                 value={formTracking}
                 onChange={e => setFormTracking(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="input-insight w-full font-mono uppercase"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Carrier Name *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Carrier Name *</label>
               <input
                 type="text"
                 required
                 value={formCarrier}
                 onChange={e => setFormCarrier(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Transport Mode</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Transport Mode</label>
               <select
                 value={formMode}
                 onChange={e => setFormMode(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               >
                 <option value="Ocean">Ocean Freight</option>
                 <option value="Air">Air Freight</option>
@@ -482,34 +474,34 @@ export const ShipmentsPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Origin Node *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Origin Node *</label>
               <input
                 type="text"
                 required
                 value={formOrigin}
                 onChange={e => setFormOrigin(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Destination Hub *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Destination Hub *</label>
               <input
                 type="text"
                 required
                 value={formDestination}
                 onChange={e => setFormDestination(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Authorized Supplier *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Authorized Supplier *</label>
               <select
                 value={formSupplierId}
                 onChange={e => setFormSupplierId(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               >
                 {suppliers.map(sup => (
                   <option key={sup.id} value={sup.id}>
@@ -522,65 +514,65 @@ export const ShipmentsPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Promised Delivery Date (SLA) *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Promised Delivery Date (SLA) *</label>
               <input
                 type="text"
                 required
                 placeholder="YYYY-MM-DDTHH:MM:SSZ"
                 value={formPromisedDate}
                 onChange={e => setFormPromisedDate(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="input-insight w-full font-mono"
               />
             </div>
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Estimated Arrival (ETA) *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Estimated Arrival (ETA) *</label>
               <input
                 type="text"
                 required
                 placeholder="YYYY-MM-DDTHH:MM:SSZ"
                 value={formEstimatedDate}
                 onChange={e => setFormEstimatedDate(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+                className="input-insight w-full font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Cargo Description & Component SKUs *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Cargo Description & Component SKUs *</label>
             <input
               type="text"
               required
               placeholder="e.g. 500 units of NVX-9400 AI Processors in refrigerated container"
               value={formCargo}
               onChange={e => setFormCargo(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Registration Audit Reason *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Registration Audit Reason *</label>
             <input
               type="text"
               required
               value={formReason}
               onChange={e => setFormReason(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
             <button
               type="button"
               disabled={isSubmitting}
               onClick={() => setIsRegisterModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+              className="btn-secondary text-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-semibold transition-colors"
+              className="btn-lime text-xs"
             >
               {isSubmitting ? 'Registering...' : 'Register Shipment'}
             </button>
@@ -598,11 +590,11 @@ export const ShipmentsPage: React.FC = () => {
       >
         <form onSubmit={handleUpdateSubmit} className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Status</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Status</label>
             <select
               value={updateStatus}
               onChange={e => setUpdateStatus(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             >
               <option value="on_schedule">On Schedule</option>
               <option value="delayed">Delayed</option>
@@ -612,44 +604,44 @@ export const ShipmentsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">New Estimated Arrival (ETA) *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">New Estimated Arrival (ETA) *</label>
             <input
               type="text"
               required
               value={updateEstimatedDate}
               onChange={e => setUpdateEstimatedDate(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+              className="input-insight w-full font-mono"
             />
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-[#777B76] mt-1 block">
               Promised SLA: {selectedShipment ? new Date(selectedShipment.promisedDeliveryDate).toUTCString() : ''}
             </span>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Reason for Update *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Reason for Update *</label>
             <input
               type="text"
               required
               placeholder="e.g. Inbound vessel delay reported by port dispatcher"
               value={updateReason}
               onChange={e => setUpdateReason(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
             <button
               type="button"
               disabled={isSubmitting}
               onClick={() => setIsUpdateModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+              className="btn-secondary text-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-semibold transition-colors"
+              className="btn-lime text-xs"
             >
               {isSubmitting ? 'Updating...' : 'Save Updates'}
             </button>
@@ -668,11 +660,11 @@ export const ShipmentsPage: React.FC = () => {
         <form onSubmit={handleIssueSubmit} className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Issue Category *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Issue Category *</label>
               <select
                 value={issueType}
                 onChange={e => setIssueType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               >
                 <option value="lead_time_increase">Lead Time Extension</option>
                 <option value="quality_hold">Quality Quarantine / Batch Failure</option>
@@ -683,11 +675,11 @@ export const ShipmentsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Severity *</label>
+              <label className="block text-[#171917] font-semibold mb-1.5">Severity *</label>
               <select
                 value={issueSeverity}
                 onChange={e => setIssueSeverity(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+                className="input-insight w-full"
               >
                 <option value="critical">Critical (Immediate Supply Threat)</option>
                 <option value="high">High (Production Delayed &gt; 48h)</option>
@@ -698,62 +690,62 @@ export const ShipmentsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Issue Title *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Issue Title *</label>
             <input
               type="text"
               required
               value={issueTitle}
               onChange={e => setIssueTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Estimated Lead Time Impact (Days)</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Estimated Lead Time Impact (Days)</label>
             <input
               type="number"
               min="0"
               value={issueDelayDays}
               onChange={e => setIssueDelayDays(parseInt(e.target.value) || 0)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+              className="input-insight w-full font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Operational Description *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Operational Description *</label>
             <textarea
               required
               rows={3}
               value={issueDesc}
               onChange={e => setIssueDesc(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">Audit Reason *</label>
+            <label className="block text-[#171917] font-semibold mb-1.5">Audit Reason *</label>
             <input
               type="text"
               required
               value={issueReason}
               onChange={e => setIssueReason(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
             <button
               type="button"
               disabled={isSubmitting}
               onClick={() => setIsIssueModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+              className="btn-secondary text-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-semibold transition-colors"
+              className="btn-lime text-xs"
             >
               {isSubmitting ? 'Recording...' : 'Record Supplier Issue'}
             </button>

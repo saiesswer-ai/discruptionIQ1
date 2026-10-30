@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ApprovalRequest, UserRole } from '../types';
+import { ApprovalRequest } from '../types';
 import { api } from '../services/httpApi';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import {
   CheckSquare,
   CheckCircle2,
-  XCircle,
-  RotateCcw,
-  AlertTriangle,
   Lock,
-  User,
-  DollarSign,
-  ShieldAlert,
-  ArrowRight,
   Zap,
 } from 'lucide-react';
 
@@ -98,14 +91,16 @@ export const ApprovalsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Role Authority Summary Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="card-light p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-white">Active Signing Authority:</span>
-            <span className="text-xs font-bold text-sky-400 font-mono">{currentUser.roleLabel}</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-semibold text-[#777B76]">Active Signing Authority:</span>
+            <span className="text-xs font-bold text-[#171917] font-mono px-2.5 py-0.5 rounded-lg bg-[#F0F1EE] border border-[#E8EAE4]">
+              {currentUser.roleLabel}
+            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Expenditure ceiling: <strong className="text-slate-200">${currentUser.approvalLimitUSD.toLocaleString()} USD</strong> ·
+          <p className="text-xs text-[#777B76] mt-1.5 font-medium">
+            Expenditure ceiling: <strong className="text-[#171917] font-bold">${currentUser.approvalLimitUSD.toLocaleString()} USD</strong> ·
             {currentUser.approvalLimitUSD > 50000
               ? ' Comprehensive enterprise executive authorization'
               : currentUser.approvalLimitUSD > 0
@@ -115,23 +110,23 @@ export const ApprovalsPage: React.FC = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-1.5 p-1 bg-[#F0F1EE] rounded-2xl border border-[#E8EAE4]">
           <button
             onClick={() => setActiveTab('pending')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all ${
               activeTab === 'pending'
-                ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171917] text-[#C8FF32] shadow-sm'
+                : 'text-[#777B76] hover:text-[#171917]'
             }`}
           >
             Pending Approvals ({pendingApprovals.length})
           </button>
           <button
             onClick={() => setActiveTab('resolved')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all ${
               activeTab === 'resolved'
-                ? 'bg-slate-850 text-white shadow-xs border border-slate-700/60'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[#171917] text-[#C8FF32] shadow-sm'
+                : 'text-[#777B76] hover:text-[#171917]'
             }`}
           >
             Decision History ({resolvedApprovals.length})
@@ -142,12 +137,12 @@ export const ApprovalsPage: React.FC = () => {
       {/* Approvals List */}
       <div className="space-y-4">
         {displayedApprovals.length === 0 ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-12 text-center text-slate-400">
-            <CheckSquare className="w-8 h-8 text-slate-600 mx-auto mb-3" />
-            <p className="text-sm font-semibold text-slate-300">
+          <div className="card-light p-12 text-center text-[#777B76]">
+            <CheckSquare className="w-10 h-10 text-[#A0A39D] mx-auto mb-3" />
+            <p className="text-base font-bold text-[#171917]">
               {activeTab === 'pending' ? 'No pending approval requests in inbox.' : 'No historical decisions logged.'}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#777B76] mt-1">
               New requests submitted from the Recovery Arena will appear here for signing.
             </p>
           </div>
@@ -157,15 +152,15 @@ export const ApprovalsPage: React.FC = () => {
             return (
               <div
                 key={approval.id}
-                className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4"
+                className="card-light p-6 space-y-4 hover:border-[#D3D8CE] transition-all"
               >
                 {/* Header row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8EAE4] pb-4">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-mono font-bold text-white">{approval.id}</span>
-                      <span className="text-[10px] font-mono text-slate-500">·</span>
-                      <span className="text-xs font-mono text-purple-300">{approval.planName}</span>
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <span className="text-xs font-mono font-bold text-[#171917]">{approval.id}</span>
+                      <span className="text-[10px] font-mono text-[#A0A39D]">·</span>
+                      <span className="text-xs font-mono font-semibold text-[#171917]">{approval.planName}</span>
                       {approval.status === 'pending' && <Badge variant="warning">Pending Review</Badge>}
                       {approval.status === 'approved' && <Badge variant="success">Approved</Badge>}
                       {approval.status === 'rejected' && <Badge variant="critical">Rejected</Badge>}
@@ -173,66 +168,66 @@ export const ApprovalsPage: React.FC = () => {
                         <Badge variant="purple">Modification Requested</Badge>
                       )}
                     </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-2">
+                    <div className="text-xs text-[#777B76] flex items-center gap-2">
                       <span>Target Disruption:</span>
-                      <strong className="text-slate-200">{approval.disruptionTitle} ({approval.disruptionId})</strong>
+                      <strong className="text-[#171917] font-semibold">{approval.disruptionTitle} ({approval.disruptionId})</strong>
                     </div>
                   </div>
 
-                  <div className="text-right font-mono text-xs text-slate-400">
-                    <div>Submitted by: <strong className="text-white">{approval.requesterName}</strong></div>
-                    <div className="text-[10px] text-slate-500">
+                  <div className="text-right font-mono text-xs text-[#777B76]">
+                    <div>Submitted by: <strong className="text-[#171917]">{approval.requesterName}</strong></div>
+                    <div className="text-[10px] text-[#A0A39D] mt-0.5">
                       {new Date(approval.requestedAt).toUTCString()}
                     </div>
                   </div>
                 </div>
 
                 {/* Metrics Matrix */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-xs font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4] text-xs font-mono">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase block">Expedite Expenditure</span>
-                    <span className="text-base font-bold text-white">${approval.estimatedCostUSD.toLocaleString()}</span>
+                    <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Expedite Expenditure</span>
+                    <span className="text-lg font-bold text-[#171917] mt-0.5 block">${approval.estimatedCostUSD.toLocaleString()}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase block">Customer Orders Protected</span>
-                    <span className="text-base font-bold text-emerald-400">{approval.affectedOrdersCount} SLAs</span>
+                    <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Customer Orders Protected</span>
+                    <span className="text-lg font-bold text-[#1b6b0c] mt-0.5 block">{approval.affectedOrdersCount} SLAs</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase block">Projected Penalty Avoidance</span>
-                    <span className="text-base font-bold text-sky-400">${approval.projectedSavingsUSD.toLocaleString()}</span>
+                    <span className="text-[10px] text-[#777B76] uppercase block font-semibold">Projected Penalty Avoidance</span>
+                    <span className="text-lg font-bold text-[#7185FF] mt-0.5 block">${approval.projectedSavingsUSD.toLocaleString()}</span>
                   </div>
                 </div>
 
                 {/* Evidence & Justification Section */}
-                <div className="p-3 bg-slate-950/60 rounded border border-slate-800 text-xs space-y-1.5">
-                  <span className="font-semibold text-slate-300 uppercase tracking-wider text-[10px] block">
+                <div className="p-4 bg-[#F0F1EE] rounded-2xl border border-[#E8EAE4] text-xs space-y-1.5">
+                  <span className="font-semibold text-[#171917] uppercase tracking-wider text-[10px] block">
                     Operational Evidence & Justification:
                   </span>
-                  <p className="text-slate-300 leading-relaxed font-sans">{approval.justificationNotes}</p>
+                  <p className="text-[#171917] leading-relaxed font-sans">{approval.justificationNotes}</p>
                 </div>
 
                 {/* Reviewer Historical Comments (if resolved) */}
                 {approval.reviewerComments && (
-                  <div className="p-3 bg-slate-950/80 rounded border border-slate-800 text-xs space-y-1">
-                    <span className="font-semibold text-slate-400 text-[10px] uppercase block">
+                  <div className="p-4 bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4] text-xs space-y-1">
+                    <span className="font-semibold text-[#777B76] text-[10px] uppercase block">
                       Reviewer Decision Note ({approval.reviewedBy} · {approval.reviewedRole}):
                     </span>
-                    <p className="text-slate-300 font-sans italic">{approval.reviewerComments}</p>
+                    <p className="text-[#171917] font-sans italic">{approval.reviewerComments}</p>
                   </div>
                 )}
 
                 {/* Action Toolbar (for pending approvals) */}
                 {approval.status === 'pending' && (
-                  <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-800/80">
+                  <div className="pt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-[#E8EAE4]">
                     {/* Authority status or Warning */}
                     <div className="text-xs">
                       {!authCheck.allowed ? (
-                        <div className="flex items-center gap-1.5 text-amber-400">
-                          <Lock className="w-3.5 h-3.5" />
-                          <span className="text-[11px]">{authCheck.reason}</span>
+                        <div className="flex items-center gap-1.5 text-[#8f6d14] bg-[#F5C451]/15 px-3 py-1.5 rounded-lg border border-[#F5C451]/30">
+                          <Lock className="w-3.5 h-3.5 text-[#F5C451]" />
+                          <span className="text-[11px] font-medium">{authCheck.reason}</span>
                         </div>
                       ) : (
-                        <span className="text-[11px] text-emerald-400 font-medium">
+                        <span className="text-[11px] text-[#1b6b0c] font-semibold bg-[#84E344]/15 px-3 py-1.5 rounded-lg border border-[#84E344]/30">
                           ✓ Authorized to sign off under active {currentUser.roleLabel} permissions
                         </span>
                       )}
@@ -245,33 +240,39 @@ export const ApprovalsPage: React.FC = () => {
                           setArenaDisruptionId(approval.disruptionId);
                           setActivePage('recovery-arena');
                         }}
-                        className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition-colors flex items-center gap-1"
+                        className="btn-secondary text-xs"
                       >
-                        <Zap className="w-3 h-3 text-purple-400" />
+                        <Zap className="w-3.5 h-3.5 text-[#171917]" />
                         <span>Inspect in Arena</span>
                       </button>
 
                       {authCheck.allowed && (
                         <>
-                          {permissions.includes('plans:modify') && <button
-                            onClick={() => handleOpenAction(approval, 'modify')}
-                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded text-xs transition-colors"
-                          >
-                            Request Modification
-                          </button>}
-                          {permissions.includes('plans:reject') && <button
-                            onClick={() => handleOpenAction(approval, 'reject')}
-                            className="px-2.5 py-1.5 bg-rose-950/70 hover:bg-rose-900 border border-rose-800/60 text-rose-300 rounded text-xs transition-colors"
-                          >
-                            Reject
-                          </button>}
-                          {permissions.some(permission => permission.startsWith('plans:approve')) && <button
-                            onClick={() => handleOpenAction(approval, 'approve')}
-                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded text-xs transition-colors shadow-sm flex items-center gap-1"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Approve Plan</span>
-                          </button>}
+                          {permissions.includes('plans:modify') && (
+                            <button
+                              onClick={() => handleOpenAction(approval, 'modify')}
+                              className="btn-secondary text-xs text-[#8f6d14]"
+                            >
+                              Request Modification
+                            </button>
+                          )}
+                          {permissions.includes('plans:reject') && (
+                            <button
+                              onClick={() => handleOpenAction(approval, 'reject')}
+                              className="px-3 py-1.5 bg-[#E85D68]/15 hover:bg-[#E85D68]/25 text-[#a82531] border border-[#E85D68]/30 rounded-xl text-xs font-semibold transition-colors"
+                            >
+                              Reject
+                            </button>
+                          )}
+                          {permissions.some(permission => permission.startsWith('plans:approve')) && (
+                            <button
+                              onClick={() => handleOpenAction(approval, 'approve')}
+                              className="btn-lime text-xs"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Approve Plan</span>
+                            </button>
+                          )}
                         </>
                       )}
                     </div>
@@ -299,19 +300,19 @@ export const ApprovalsPage: React.FC = () => {
           <>
             <button
               onClick={() => setActionType(null)}
-              className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded text-xs hover:bg-slate-700"
+              className="btn-secondary text-xs"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmAction}
-              className={`px-4 py-1.5 text-white rounded text-xs font-semibold ${
+              className={
                 actionType === 'approve'
-                  ? 'bg-emerald-600 hover:bg-emerald-500'
+                  ? 'btn-lime text-xs'
                   : actionType === 'reject'
-                  ? 'bg-rose-600 hover:bg-rose-500'
-                  : 'bg-amber-600 hover:bg-amber-500'
-              }`}
+                  ? 'px-4 py-2 bg-[#E85D68] hover:bg-[#d44e59] text-white rounded-xl text-xs font-semibold shadow-sm transition-colors'
+                  : 'btn-secondary text-xs text-[#8f6d14]'
+              }
             >
               Confirm {actionType === 'approve' ? 'Approval' : actionType === 'reject' ? 'Rejection' : 'Request'}
             </button>
@@ -319,23 +320,23 @@ export const ApprovalsPage: React.FC = () => {
         }
       >
         <div className="space-y-4 text-xs">
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded font-mono text-slate-300 space-y-1">
+          <div className="p-4 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl font-mono text-[#777B76] space-y-2">
             <div className="flex justify-between">
               <span>Disruption:</span>
-              <strong className="text-white">{selectedApproval?.disruptionId}</strong>
+              <strong className="text-[#171917]">{selectedApproval?.disruptionId}</strong>
             </div>
             <div className="flex justify-between">
               <span>Authorized Expenditure:</span>
-              <strong className="text-white">${selectedApproval?.estimatedCostUSD.toLocaleString()} USD</strong>
+              <strong className="text-[#171917]">${selectedApproval?.estimatedCostUSD.toLocaleString()} USD</strong>
             </div>
             <div className="flex justify-between">
               <span>Orders Protected:</span>
-              <strong className="text-emerald-400">{selectedApproval?.affectedOrdersCount} SLAs</strong>
+              <strong className="text-[#1b6b0c]">{selectedApproval?.affectedOrdersCount} SLAs</strong>
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-medium mb-1">
+            <label className="block text-[#171917] font-semibold mb-1.5">
               {actionType === 'approve'
                 ? 'Reviewer Signing Comments (Optional)'
                 : actionType === 'reject'
@@ -353,7 +354,7 @@ export const ApprovalsPage: React.FC = () => {
                   ? 'e.g., Cost exceeds allowable threshold for non-critical line items.'
                   : 'e.g., Please explore split fulfillment option to lower air charter commitment.'
               }
-              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white text-xs focus:outline-none focus:border-purple-500"
+              className="input-insight w-full"
             />
           </div>
         </div>

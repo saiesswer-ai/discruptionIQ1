@@ -78,10 +78,10 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Facility Name *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Facility Name *</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             placeholder="e.g. Frankfurt Air Logistics Hub"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -91,10 +91,10 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Location / Address *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Location / Address *</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               placeholder="e.g. Frankfurt Airport, CargoCity"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
@@ -102,10 +102,10 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">City</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">City</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               placeholder="e.g. Frankfurt"
               value={city}
               onChange={(e) => setCity(e.target.value)}
@@ -115,10 +115,10 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Country *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Country *</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               placeholder="e.g. Germany"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -126,9 +126,9 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Operating Company</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Operating Company</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={companyId}
               onChange={(e) => setCompanyId(e.target.value)}
             >
@@ -143,22 +143,22 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Total Capacity (sqm) *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Total Capacity (sqm) *</label>
             <input
               type="number"
               min="1000"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={totalCapacitySqm}
               onChange={(e) => setTotalCapacitySqm(Math.max(1, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Dock Doors</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Dock Doors</label>
             <input
               type="number"
               min="1"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={availableDockDoors}
               onChange={(e) => setAvailableDockDoors(Math.max(1, Number(e.target.value)))}
               required
@@ -168,20 +168,20 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Hub Manager Name</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Hub Manager Name</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               placeholder="e.g. Klaus Richter"
               value={managerName}
               onChange={(e) => setManagerName(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Contact Email</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Contact Email</label>
             <input
               type="email"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               placeholder="e.g. klaus.richter@disruptioniq.demo"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
@@ -189,18 +189,18 @@ export const AddWarehouseModal: React.FC<AddWarehouseModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Registering...' : 'Create Warehouse'}
           </button>
@@ -285,10 +285,10 @@ export const EditWarehouseModal: React.FC<EditWarehouseModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Facility Name</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Facility Name</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -296,10 +296,10 @@ export const EditWarehouseModal: React.FC<EditWarehouseModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Location</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Location</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
@@ -308,22 +308,22 @@ export const EditWarehouseModal: React.FC<EditWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Total Capacity (sqm)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Total Capacity (sqm)</label>
             <input
               type="number"
               min="1000"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={totalCapacitySqm}
               onChange={(e) => setTotalCapacitySqm(Math.max(1, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Dock Doors</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Dock Doors</label>
             <input
               type="number"
               min="1"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={availableDockDoors}
               onChange={(e) => setAvailableDockDoors(Math.max(1, Number(e.target.value)))}
               required
@@ -333,18 +333,18 @@ export const EditWarehouseModal: React.FC<EditWarehouseModalProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Manager Name</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Manager Name</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={managerName}
               onChange={(e) => setManagerName(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Operating Status</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Operating Status</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={operatingStatus}
               onChange={(e) => setOperatingStatus(e.target.value)}
             >
@@ -356,27 +356,27 @@ export const EditWarehouseModal: React.FC<EditWarehouseModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Contact Email</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Contact Email</label>
           <input
             type="email"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Saving...' : 'Update Warehouse'}
           </button>
@@ -449,10 +449,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">SKU Code *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">SKU Code *</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white uppercase font-mono focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs uppercase font-mono"
               placeholder="e.g. SKU-SEN-21"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
@@ -460,9 +460,9 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Category *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Category *</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -478,10 +478,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Product Title *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Product Title *</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             placeholder="e.g. LiDAR Precision Sensor Module"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -490,9 +490,9 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Description</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Description</label>
           <textarea
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             rows={2}
             placeholder="e.g. High-performance distance ranging module for robotics"
             value={description}
@@ -502,51 +502,51 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
 
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Unit Cost ($)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Unit Cost ($)</label>
             <input
               type="number"
               min="1"
               step="0.01"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={unitCostUSD}
               onChange={(e) => setUnitCostUSD(Math.max(0.01, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Dimensions (cm)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Dimensions (cm)</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={dimensionsCm}
               onChange={(e) => setDimensionsCm(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Weight (kg)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Weight (kg)</label>
             <input
               type="number"
               min="0.01"
               step="0.01"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={weightKg}
               onChange={(e) => setWeightKg(Math.max(0.01, Number(e.target.value)))}
             />
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Cataloguing...' : 'Save Product'}
           </button>
@@ -632,9 +632,9 @@ export const AddInventoryModal: React.FC<AddInventoryModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Target Warehouse *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Target Warehouse *</label>
           <select
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={warehouseId}
             onChange={(e) => setWarehouseId(e.target.value)}
             required
@@ -648,9 +648,9 @@ export const AddInventoryModal: React.FC<AddInventoryModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Product / SKU *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Product / SKU *</label>
           <select
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs font-mono"
             value={sku}
             onChange={(e) => handleSkuChange(e.target.value)}
             required
@@ -665,34 +665,34 @@ export const AddInventoryModal: React.FC<AddInventoryModalProps> = ({
 
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Initial On-Hand</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Initial On-Hand</label>
             <input
               type="number"
               min="0"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={onHandUnits}
               onChange={(e) => setOnHandUnits(Math.max(0, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Safety Stock Buffer</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Safety Stock Buffer</label>
             <input
               type="number"
               min="0"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={safetyStockThreshold}
               onChange={(e) => setSafetyStockThreshold(Math.max(0, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Unit Valuation ($)</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Unit Valuation ($)</label>
             <input
               type="number"
               min="0.01"
               step="0.01"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={unitCostUSD}
               onChange={(e) => setUnitCostUSD(Math.max(0.01, Number(e.target.value)))}
               required
@@ -700,18 +700,18 @@ export const AddInventoryModal: React.FC<AddInventoryModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Provisioning...' : 'Add Inventory Slot'}
           </button>
@@ -801,9 +801,9 @@ export const RecordStockReceiptModal: React.FC<RecordStockReceiptModalProps> = (
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Receiving Warehouse *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Receiving Warehouse *</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={warehouseId}
               onChange={(e) => setWarehouseId(e.target.value)}
               required
@@ -816,9 +816,9 @@ export const RecordStockReceiptModal: React.FC<RecordStockReceiptModalProps> = (
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Product / SKU *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Product / SKU *</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs font-mono"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               required
@@ -834,21 +834,21 @@ export const RecordStockReceiptModal: React.FC<RecordStockReceiptModalProps> = (
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Received Quantity *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Received Quantity *</label>
             <input
               type="number"
               min="1"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Receipt Manifest / Ref *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Receipt Manifest / Ref *</label>
             <input
               type="text"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs font-mono"
               value={receiptReference}
               onChange={(e) => setReceiptReference(e.target.value)}
               required
@@ -857,27 +857,27 @@ export const RecordStockReceiptModal: React.FC<RecordStockReceiptModalProps> = (
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Inspector / Dock Notes</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Inspector / Dock Notes</label>
           <textarea
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Receiving...' : 'Record Dock Receipt'}
           </button>
@@ -1006,9 +1006,9 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
         {/* Source & Destination */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Source Warehouse (Origin) *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Source Warehouse (Origin) *</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={sourceWarehouseId}
               onChange={(e) => setSourceWarehouseId(e.target.value)}
               required
@@ -1021,9 +1021,9 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Destination Warehouse *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Destination Warehouse *</label>
             <select
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={destinationWarehouseId}
               onChange={(e) => setDestinationWarehouseId(e.target.value)}
               required
@@ -1041,9 +1041,9 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
 
         {/* SKU Selector */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Product SKU to Transfer *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Product SKU to Transfer *</label>
           <select
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs font-mono"
             value={sku}
             onChange={(e) => setSku(e.target.value)}
             required
@@ -1058,24 +1058,24 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
 
         {/* Source Inventory Health Status Card */}
         {activeSourceItem && (
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded text-xs space-y-1">
-            <div className="flex justify-between text-slate-400">
+          <div className="p-3.5 bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl text-xs space-y-1.5">
+            <div className="flex justify-between text-[#777B76]">
               <span>Source Available Stock:</span>
-              <span className="font-mono font-bold text-white">{availableUnits} units</span>
+              <span className="font-mono font-bold text-[#171917]">{availableUnits} units</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-[#777B76]">
               <span>Safety Buffer Threshold:</span>
-              <span className="font-mono text-amber-400">{safetyThreshold} units</span>
+              <span className="font-mono text-[#F5C451]">{safetyThreshold} units</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-[#777B76]">
               <span>Projected Post-Transfer Balance:</span>
               <span
                 className={`font-mono font-bold ${
                   postTransferAvailable < 0
-                    ? 'text-rose-400'
+                    ? 'text-[#E85D68]'
                     : postTransferAvailable < safetyThreshold
-                    ? 'text-amber-400'
-                    : 'text-emerald-400'
+                    ? 'text-[#F5C451]'
+                    : 'text-[#1b6b0c]'
                 }`}
               >
                 {postTransferAvailable} units
@@ -1083,13 +1083,13 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
             </div>
 
             {isInsufficient && (
-              <div className="flex items-center gap-1.5 text-rose-400 pt-1">
+              <div className="flex items-center gap-1.5 text-[#E85D68] pt-1">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>Insufficient source inventory. Cannot transfer more than {availableUnits} units.</span>
               </div>
             )}
             {breachesSafety && (
-              <div className="flex items-center gap-1.5 text-amber-400 pt-1">
+              <div className="flex items-center gap-1.5 text-[#F5C451] pt-1">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>Warning: Remaining stock will dip below the safety buffer of {safetyThreshold} units.</span>
               </div>
@@ -1100,22 +1100,22 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
         {/* Quantity & Expected Arrival */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Transfer Units *</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Transfer Units *</label>
             <input
               type="number"
               min="1"
               max={availableUnits || 1000}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
               required
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Expected Delivery Date</label>
+            <label className="block text-xs font-semibold text-[#171917] mb-1.5">Expected Delivery Date</label>
             <input
               type="date"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+              className="input-insight w-full text-xs"
               value={expectedArrival}
               onChange={(e) => setExpectedArrival(e.target.value)}
             />
@@ -1124,10 +1124,10 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
 
         {/* Reason & Auth Info */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Operational Transfer Justification *</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Operational Transfer Justification *</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             required
@@ -1135,27 +1135,27 @@ export const RequestTransferModal: React.FC<RequestTransferModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Authorization Reference</label>
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">Authorization Reference</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             value={authorizationInfo}
             onChange={(e) => setAuthorizationInfo(e.target.value)}
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || isInsufficient}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50"
+            className="btn-lime text-xs disabled:opacity-50"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Transfer Request'}
           </button>
@@ -1267,31 +1267,31 @@ export const TransferActionModal: React.FC<TransferActionModalProps> = ({
       maxWidth="md"
     >
       <form onSubmit={handleConfirm} className="space-y-4">
-        <div className="p-3 bg-slate-950 border border-slate-800 rounded text-xs space-y-1.5">
-          <div className="flex justify-between text-slate-400">
+        <div className="p-3.5 bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl text-xs space-y-1.5">
+          <div className="flex justify-between text-[#777B76]">
             <span>Route:</span>
-            <span className="font-mono text-white">
+            <span className="font-mono text-[#171917]">
               {transfer.sourceWarehouseId} → {transfer.destinationWarehouseId}
             </span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-[#777B76]">
             <span>SKU & Quantity:</span>
-            <span className="font-mono font-bold text-white">
+            <span className="font-mono font-bold text-[#171917]">
               {transfer.sku} ({transfer.quantity} units)
             </span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-[#777B76]">
             <span>Current Status:</span>
-            <span className="font-mono uppercase text-purple-400">{transfer.status}</span>
+            <span className="font-mono uppercase text-[#171917]">{transfer.status}</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-[#171917] mb-1.5">
             {actionType === 'cancel' ? 'Cancellation Reason *' : 'Audit Trail Notes & References *'}
           </label>
           <textarea
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-sm text-white focus:outline-none focus:border-purple-500"
+            className="input-insight w-full text-xs"
             rows={3}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -1299,18 +1299,18 @@ export const TransferActionModal: React.FC<TransferActionModalProps> = ({
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#E8EAE4]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-medium transition-colors"
+            className="btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-4 py-2 text-white rounded text-sm font-medium transition-colors disabled:opacity-50 ${details.buttonColor}`}
+            className={`px-4 py-2 text-[#171917] rounded text-sm font-medium transition-colors disabled:opacity-50 ${details.buttonColor}`}
           >
             {isSubmitting ? 'Processing...' : details.buttonLabel}
           </button>
