@@ -471,6 +471,51 @@ def test_connect_manual_disruption_to_recovery_arena():
     assert "feasibilityScore" in sim_plan
 
 
+def test_manual_shipment_mapping_resolves_real_orders_and_generates_plans():
+    """A real delayed shipment uses the canonical resolver, not title text, to link demand."""
+    headers = _auth("manager")
+    response = client.post("/api/v1/disruptions", json={
+        "type": "carrier_delay",
+        "title": "Manual shipment impact mapping",
+        "severity": "high",
+        "location": "Rotterdam",
+        "summary": "Selected shipment has a confirmed operational delay.",
+        "affectedShipmentId": "SHP-99214",
+        "reason": "Carrier confirmation",
+    }, headers=headers)
+    assert response.status_code == 201, response.text
+    disruption_id = response.json()["id"]
+
+    detail = client.get(f"/api/v1/disruptions/{disruption_id}", headers=headers)
+    assert detail.status_code == 200
+    linked_orders = {item["id"] for item in detail.json()["affectedOrders"]}
+    assert linked_orders
+
+    plans = client.post("/api/v1/recovery/plans", json={"disruptionId": disruption_id}, headers=headers)
+    assert plans.status_code == 201, plans.text
+    assert plans.json()
+
+
+def test_unlinked_manual_disruption_returns_missing_impact_context():
+    """No plans are fabricated when a report contains no demand relationship."""
+    headers = _auth("manager")
+    response = client.post("/api/v1/disruptions", json={
+        "type": "weather_disruption",
+        "title": "Unmapped weather report",
+        "severity": "medium",
+        "location": "Open ocean",
+        "summary": "No linked shipment, SKU, warehouse, or order is available yet.",
+        "reason": "Early advisory",
+    }, headers=headers)
+    assert response.status_code == 201
+
+    plans = client.post("/api/v1/recovery/plans", json={"disruptionId": response.json()["id"]}, headers=headers)
+    assert plans.status_code == 422
+    detail = plans.json()["detail"]
+    assert detail["code"] == "MISSING_IMPACT_CONTEXT"
+    assert "affected order" in detail["message"]
+
+
 # ---------------------------------------------------------------------------
 # 6. Security & RBAC Enforcement Tests
 # ---------------------------------------------------------------------------

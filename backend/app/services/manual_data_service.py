@@ -35,7 +35,7 @@ from app.schemas.inventory import (
 from app.schemas.order import OrderAtRisk, OrderCreate, OrderUpdate
 from app.schemas.shipment import Shipment as ShipmentSchema, ShipmentCreate, ShipmentUpdate
 from app.schemas.supplier import Supplier as SupplierSchema, SupplierIssueCreate
-from app.services.disruption_intelligence import _detect_for_shipment, _risk_level
+from app.services.disruption_intelligence import _detect_for_shipment, _impact_and_score, _risk_level, _shipment_skus
 
 
 def _now() -> datetime:
@@ -238,8 +238,11 @@ def create_manual_disruption(
             )
 
     valid_orders: list[Order] = []
+    seen_order_ids: set[str] = set()
     if payload.affectedOrderIds:
         for ord_id in payload.affectedOrderIds:
+            if ord_id in seen_order_ids:
+                continue
             ord_obj = db.get(Order, ord_id)
             if not ord_obj:
                 raise HTTPException(
@@ -247,6 +250,19 @@ def create_manual_disruption(
                     detail={"code": "INVALID_REFERENCE", "message": f"Referenced order '{ord_id}' not found."},
                 )
             valid_orders.append(ord_obj)
+            seen_order_ids.add(ord_id)
+
+    # A manual SKU mapping is operational evidence, not free text.  Ensure it
+    # points to a real inventory SKU before it can drive order resolution.
+    selected_skus = sorted(set(payload.affectedSKUs or []))
+    if selected_skus:
+        known_skus = set(db.scalars(select(Inventory.sku).where(Inventory.sku.in_(selected_skus))).all())
+        missing_skus = sorted(set(selected_skus) - known_skus)
+        if missing_skus:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={"code": "INVALID_REFERENCE", "message": f"Unknown affected SKU(s): {', '.join(missing_skus)}."},
+            )
 
     detected_at = _parse_iso(payload.detectedAt) if payload.detectedAt else _now()
     disruption_id = f"DIS-MANUAL-{uuid.uuid4().hex[:8].upper()}"
@@ -272,7 +288,7 @@ def create_manual_disruption(
         "delayHours": payload.delayHours,
         "estimatedFinancialImpactUSD": payload.estimatedFinancialImpactUSD or 0.0,
         "affectedOrderCount": len(valid_orders),
-        "affectedSKUs": payload.affectedSKUs or [],
+        "affectedSKUs": selected_skus,
         "timeline": timeline_events,
         "evidence": payload.evidence or [{"kind": "manual_report", "facts": {"reporter": actor_id, "reason": payload.reason}}],
     }
@@ -289,36 +305,21 @@ def create_manual_disruption(
     db.add(record)
     db.flush()
 
-    # Link DisruptionImpact records
+    # Build impact links before writing them so inferred and explicitly selected
+    # relationships share one deduplicated, transactional persistence path.
+    impacts: dict[tuple[str, str], dict[str, Any]] = {}
+
+    def add_impact(entity_type: str, entity_id: str, evidence: dict[str, Any]) -> None:
+        impacts.setdefault((entity_type, entity_id), evidence)
+
     if shipment:
-        db.add(DisruptionImpact(
-            disruption_id=disruption_id,
-            entity_type="shipment",
-            entity_id=shipment.id,
-            evidence_json=json.dumps({"kind": "affected_shipment", "facts": {"trackingNumber": shipment.tracking_number, "carrier": shipment.carrier_name}}),
-        ))
+        add_impact("shipment", shipment.id, {"kind": "affected_shipment", "facts": {"trackingNumber": shipment.tracking_number, "carrier": shipment.carrier_name}})
     if supplier:
-        db.add(DisruptionImpact(
-            disruption_id=disruption_id,
-            entity_type="supplier",
-            entity_id=supplier.id,
-            evidence_json=json.dumps({"kind": "affected_supplier", "facts": {"name": supplier.name, "category": supplier.category}}),
-        ))
+        add_impact("supplier", supplier.id, {"kind": "affected_supplier", "facts": {"name": supplier.name, "category": supplier.category}})
     if warehouse:
-        db.add(DisruptionImpact(
-            disruption_id=disruption_id,
-            entity_type="warehouse",
-            entity_id=warehouse.id,
-            evidence_json=json.dumps({"kind": "affected_warehouse", "facts": {"name": warehouse.name, "city": warehouse.city}}),
-        ))
-    if payload.affectedSKUs:
-        for sku in payload.affectedSKUs:
-            db.add(DisruptionImpact(
-                disruption_id=disruption_id,
-                entity_type="sku",
-                entity_id=sku,
-                evidence_json=json.dumps({"kind": "affected_sku", "facts": {"sku": sku}}),
-            ))
+        add_impact("warehouse", warehouse.id, {"kind": "affected_warehouse", "facts": {"name": warehouse.name, "city": warehouse.city}})
+    for sku in selected_skus:
+        add_impact("sku", sku, {"kind": "affected_sku", "facts": {"sku": sku}})
 
     # Link Orders and compute risk
     for ord_obj in valid_orders:
@@ -328,32 +329,35 @@ def create_manual_disruption(
             ord_obj.risk_score = 75
             ord_obj.risk_level = _risk_level(75)
             ord_obj.explanation = f"Linked to manual disruption {disruption_id}: {payload.title}"
+        add_impact("order", ord_obj.id, {"kind": "directly_affected_order", "facts": {"priority": ord_obj.priority, "riskScore": ord_obj.risk_score}})
+
+    # For a real shipment, use the same deterministic impact resolver as carrier
+    # events.  It joins manifest SKUs, destination warehouse, deadline and actual
+    # availability; a title or description alone never creates an order link.
+    if not valid_orders and shipment:
+        shipment_skus = selected_skus or _shipment_skus(db, shipment)
+        for entity_type, entity_id, evidence in _impact_and_score(db, record, shipment, shipment_skus, settings):
+            add_impact(entity_type, entity_id, evidence)
+    # An explicitly selected SKU + warehouse is sufficient operational context
+    # for a manual inventory disruption.  A SKU alone is deliberately not
+    # enough: it could match orders across unrelated facilities.
+    elif not valid_orders and selected_skus and warehouse:
+        statement = select(Order).join(OrderLine, OrderLine.order_id == Order.id).where(OrderLine.sku.in_(selected_skus)).distinct()
+        statement = statement.where(Order.primary_warehouse_id == warehouse.id)
+        for cand in db.scalars(statement).all():
+            cand.associated_disruption_id = disruption_id
+            add_impact("order", cand.id, {"kind": "selected_sku_mapping", "facts": {"skus": selected_skus, "warehouseId": warehouse.id if warehouse else None}})
+
+    for (entity_type, entity_id), evidence in impacts.items():
         db.add(DisruptionImpact(
             disruption_id=disruption_id,
-            entity_type="order",
-            entity_id=ord_obj.id,
-            evidence_json=json.dumps({"kind": "at_risk_order", "facts": {"priority": ord_obj.priority, "riskScore": ord_obj.risk_score}}),
+            entity_type=entity_type,
+            entity_id=entity_id,
+            evidence_json=json.dumps(evidence),
         ))
 
-    # If no explicit orders were given, but shipment or SKUs were given, auto-resolve affected orders
-    if not valid_orders and (payload.affectedSKUs or shipment):
-        skus_to_match = set(payload.affectedSKUs or [])
-        if shipment and not skus_to_match:
-            from app.services.disruption_intelligence import _shipment_skus
-            skus_to_match.update(_shipment_skus(db, shipment))
-
-        if skus_to_match:
-            candidate_orders = db.scalars(
-                select(Order).join(OrderLine, OrderLine.order_id == Order.id).where(OrderLine.sku.in_(skus_to_match)).distinct()
-            ).all()
-            for cand in candidate_orders:
-                cand.associated_disruption_id = disruption_id
-                db.add(DisruptionImpact(
-                    disruption_id=disruption_id,
-                    entity_type="order",
-                    entity_id=cand.id,
-                    evidence_json=json.dumps({"kind": "at_risk_order", "facts": {"priority": cand.priority, "riskScore": cand.risk_score}}),
-                ))
+    record_payload["affectedOrderCount"] = sum(1 for entity_type, _ in impacts if entity_type == "order")
+    record.payload_json = json.dumps(record_payload, default=str)
 
     # Record Audit
     record_audit(

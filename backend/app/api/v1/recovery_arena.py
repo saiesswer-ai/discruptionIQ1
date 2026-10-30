@@ -29,6 +29,7 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.core.permissions import Permission, normalize_role, role_has_permission
 from app.models.auth import User, UserRole
+from app.models.governance import DisruptionImpact, DisruptionRecord
 from app.models.recovery import PlanAuditEvent
 from app.services.plan_executor import (
     ExecutionError,
@@ -94,6 +95,30 @@ def _execution_error_to_http(e: ExecutionError) -> HTTPException:
     return HTTPException(status_code=http_status, detail={"code": e.code, "message": e.reason})
 
 
+def _missing_impact_context(db: Session, disruption_id: str) -> dict:
+    """Describe why a disruption cannot yet be planned without inventing demand."""
+    record = db.get(DisruptionRecord, disruption_id)
+    if record is None:
+        return {"code": "DISRUPTION_NOT_FOUND", "message": f"Disruption {disruption_id} was not found."}
+    impact_types = set(db.scalars(
+        select(DisruptionImpact.entity_type).where(DisruptionImpact.disruption_id == disruption_id)
+    ).all())
+    mappings: list[str] = []
+    if "shipment" not in impact_types:
+        mappings.append("a validated affected shipment")
+    if "sku" not in impact_types:
+        mappings.append("one or more affected SKUs")
+    if "order" not in impact_types:
+        mappings.append("a directly affected order, or a shipment/SKU mapping that resolves affected orders")
+    return {
+        "code": "MISSING_IMPACT_CONTEXT",
+        "message": "Recovery planning needs validated affected demand. Add " + ", ".join(mappings) + " in the disruption report, then try again.",
+        "disruptionId": disruption_id,
+        "availableMappings": sorted(impact_types),
+        "missingMappings": mappings,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
@@ -125,8 +150,8 @@ def create_recovery_plans(
     )
     if not plans:
         raise HTTPException(
-            status_code=404,
-            detail=f"No orders linked to disruption {body.disruptionId}; cannot generate plans",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_missing_impact_context(db, body.disruptionId),
         )
     return plans
 

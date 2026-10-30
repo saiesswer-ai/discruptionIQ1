@@ -45,6 +45,7 @@ export const RecoveryArenaPage: React.FC = () => {
   } = useApp();
 
   const [plans, setPlans] = useState<RecoveryPlan[]>([]);
+  const [generationFeedback, setGenerationFeedback] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'comparison' | 'allocation' | 'constraints'>('comparison');
 
@@ -102,10 +103,15 @@ export const RecoveryArenaPage: React.FC = () => {
     try {
       const generated = await api.createRecoveryPlans(activeDisruption.id);
       setPlans(generated);
+      setGenerationFeedback(null);
       setSelectedPlanId(generated[0]?.id || '');
       showToast(`${generated.length} backend-generated recovery plans are ready for review.`, 'success');
       refreshData();
-    } catch (err: any) { showToast(err.message || 'Unable to generate recovery plans.', 'error'); }
+    } catch (err: any) {
+      const message = err.message || 'Unable to generate recovery plans.';
+      setGenerationFeedback(message);
+      showToast(message, 'error');
+    }
   };
 
   // Confirmed simulation execution
@@ -252,6 +258,12 @@ export const RecoveryArenaPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {generationFeedback && (
+        <div className="-mt-3 p-3 bg-amber-950/40 border border-amber-800/70 rounded text-xs text-amber-200">
+          <strong>Candidate plans were not generated.</strong> {generationFeedback}
+        </div>
+      )}
 
       {/* 2. Disruption Affected Orders & Warehouse Inventory Availability Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
