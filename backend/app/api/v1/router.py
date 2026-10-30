@@ -29,13 +29,20 @@ from app.schemas.inventory import (
     StockMovementRequest,
     WarehouseInventory,
 )
-from app.schemas.order import OrderAtRisk, OrderCreate, OrderUpdate
+from app.schemas.order import (
+    BulkOrderCreateRequest,
+    BulkOrderCreateResponse,
+    OrderAtRisk,
+    OrderCreate,
+    OrderUpdate,
+)
 from app.schemas.shipment import Shipment, ShipmentCreate, ShipmentUpdate
 from app.schemas.supplier import Supplier, SupplierIssueCreate
 from app.schemas.webhook import CarrierWebhook
 from app.services.disruption_intelligence import disruption_detail, ingest_carrier_event
 from app.services.manual_data_service import (
     adjust_inventory,
+    bulk_create_orders,
     create_manual_disruption,
     create_order,
     create_shipment,
@@ -169,6 +176,23 @@ def create_new_order(
     """Create a customer order with validated lines and authoritative backend risk scoring."""
     _check_perm(current_user, Permission.ORDERS_WRITE)
     return create_order(
+        db,
+        payload=payload,
+        actor_id=current_user.username,
+        actor_role=current_user.role,
+        settings=get_settings(),
+    )
+
+
+@api_router.post("/orders/bulk", response_model=BulkOrderCreateResponse, status_code=status.HTTP_200_OK, tags=["Orders"])
+def bulk_create_new_orders(
+    payload: BulkOrderCreateRequest,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> BulkOrderCreateResponse:
+    """Import a batch of customer orders with validation, idempotency, and audit logging."""
+    _check_perm(current_user, Permission.ORDERS_WRITE)
+    return bulk_create_orders(
         db,
         payload=payload,
         actor_id=current_user.username,

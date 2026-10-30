@@ -131,6 +131,7 @@ class Order(Base):
     primary_warehouse_id: Mapped[str] = mapped_column(ForeignKey("warehouses.warehouse_id"))
     fulfillment_policy: Mapped[str] = mapped_column(String(32), default="FULL_ONLY")
     explanation: Mapped[str] = mapped_column(Text)
+    order_ref: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
 
 

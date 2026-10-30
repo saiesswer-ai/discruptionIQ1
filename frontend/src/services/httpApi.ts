@@ -131,6 +131,41 @@ export interface CreateOrderPayload {
   reason?: string;
 }
 
+export interface BulkOrderItemPayload {
+  orderRef: string;
+  customerName: string;
+  customerTier: string;
+  priority: string;
+  promisedDeadline: string;
+  primaryWarehouseId: string;
+  fulfillmentPolicy?: string;
+  orderLines: OrderLinePayload[];
+  notes?: string;
+}
+
+export interface BulkOrderCreatePayload {
+  orders: BulkOrderItemPayload[];
+  auditJustification: string;
+}
+
+export interface BulkOrderResultItem {
+  orderRef: string;
+  success: boolean;
+  orderId?: string | null;
+  orderValueUSD?: number | null;
+  riskScore?: number | null;
+  riskLevel?: string | null;
+  primaryRootCause?: string | null;
+  reason?: string | null;
+}
+
+export interface BulkOrderCreateResponse {
+  results: BulkOrderResultItem[];
+  totalProcessed: number;
+  successfulCount: number;
+  failedCount: number;
+}
+
 export interface UpdateOrderPayload {
   priority?: string;
   promisedDeadline?: string;
@@ -249,6 +284,7 @@ class FastApiClient {
   updateShipment(id: string, data: UpdateShipmentPayload) { return this.request<Shipment>(`/shipments/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
   recordSupplierIssue(data: SupplierIssuePayload) { return this.request<Supplier>('/suppliers/issues', { method: 'POST', body: JSON.stringify(data) }); }
   createOrder(data: CreateOrderPayload) { return this.request<OrderAtRisk>('/orders', { method: 'POST', body: JSON.stringify(data) }); }
+  bulkCreateOrders(data: BulkOrderCreatePayload) { return this.request<BulkOrderCreateResponse>('/orders/bulk', { method: 'POST', body: JSON.stringify(data) }); }
   updateOrder(id: string, data: UpdateOrderPayload) { return this.request<OrderAtRisk>(`/orders/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
   getRecoveryPlans(disruptionId: string) { return this.request<RecoveryPlan[]>(`/recovery/${encodeURIComponent(disruptionId)}/plans`); }
   createRecoveryPlans(disruptionId: string) { return this.request<RecoveryPlan[]>('/recovery/plans', { method: 'POST', body: JSON.stringify({ disruptionId }) }); }

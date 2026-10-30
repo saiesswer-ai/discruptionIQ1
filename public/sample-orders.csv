@@ -1,0 +1,6 @@
+order_ref,customer_name,customer_tier,sla_priority,fulfillment_hub,fulfillment_policy,deadline,sku,quantity,unit_price,notes
+IMP-001,AeroTech Avionics AG,Enterprise,P1,WH-RTM-01,FULL_ONLY,2026-11-05T08:00:00Z,NVX-9400,150,1076.67,Critical hyperscale aerospace cluster rollout
+IMP-001,AeroTech Avionics AG,Enterprise,P1,WH-RTM-01,FULL_ONLY,2026-11-05T08:00:00Z,ETH-200X,50,420.00,Critical hyperscale aerospace cluster rollout
+IMP-002,Nordic Data Grid AB,Enterprise,P1,WH-RTM-01,FULL_ONLY,2026-11-05T10:00:00Z,NVX-9400,120,1076.67,Stockholm cloud expansion node deployment
+IMP-003,Quantum Dynamics Corp,Enterprise,P1,WH-FRA-01,FULL_ONLY,2026-11-06T09:00:00Z,CAB-HD12,25,1450.00,Expedited enterprise order creation
+IMP-004,Nordic Data Grid AB,Enterprise,P1,WH-RTM-01,FULL_ONLY,2026-11-07T09:00:00Z,ETH-200X,60,420.00,Network refresh for Stockholm data hall

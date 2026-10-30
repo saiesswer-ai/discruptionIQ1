@@ -48,3 +48,38 @@ class OrderUpdate(BaseModel):
     mitigationStatus: str | None = None
     primaryWarehouseId: str | None = None
     reason: str = "Order attributes update"
+
+
+class BulkOrderItem(BaseModel):
+    orderRef: str
+    customerName: str
+    customerTier: str  # Enterprise, Strategic, Standard
+    priority: str  # P1, P2, P3
+    promisedDeadline: str  # ISO timestamp
+    primaryWarehouseId: str
+    fulfillmentPolicy: str = "FULL_ONLY"
+    orderLines: list[OrderLineCreate]
+    notes: str | None = None
+
+
+class BulkOrderCreateRequest(BaseModel):
+    orders: list[BulkOrderItem]
+    auditJustification: str
+
+
+class BulkOrderResultItem(BaseModel):
+    orderRef: str
+    success: bool
+    orderId: str | None = None
+    orderValueUSD: float | None = None
+    riskScore: int | None = None
+    riskLevel: str | None = None
+    primaryRootCause: str | None = None
+    reason: str | None = None
+
+
+class BulkOrderCreateResponse(BaseModel):
+    results: list[BulkOrderResultItem]
+    totalProcessed: int
+    successfulCount: int
+    failedCount: int

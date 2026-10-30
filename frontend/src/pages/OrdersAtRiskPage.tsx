@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { PriorityBadge, RiskScoreBadge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
+import { BulkOrderImportTab } from '../components/orders/BulkOrderImportTab';
 import { api } from '../services/httpApi';
 import { OrderAtRisk, OrderPriority } from '../types';
 import {
@@ -39,6 +40,11 @@ export const OrdersAtRiskPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Order modal tab ('manual' | 'csv')
+  const [orderModalTab, setOrderModalTab] = useState<'manual' | 'csv'>('manual');
+  // Highlight newly imported orders
+  const [recentlyImportedIds, setRecentlyImportedIds] = useState<Set<string>>(new Set());
 
   // Selected Order for Edit
   const [selectedOrder, setSelectedOrder] = useState<OrderAtRisk | null>(null);
@@ -93,6 +99,7 @@ export const OrdersAtRiskPage: React.FC = () => {
   });
 
   const handleOpenCreate = () => {
+    setOrderModalTab('manual');
     setCustomerName('Quantum Dynamics Corp');
     setCustomerTier('Enterprise');
     setPriority('P1');
@@ -325,7 +332,14 @@ export const OrdersAtRiskPage: React.FC = () => {
                 filteredOrders.map(o => (
                   <tr key={o.id} className="hover:bg-slate-850/60 transition-colors">
                     <td className="py-3 px-4 font-semibold text-white">
-                      {o.id}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{o.id}</span>
+                        {recentlyImportedIds.has(o.id) && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            Imported
+                          </span>
+                        )}
+                      </div>
                       <div className="text-[10px] text-slate-500 font-normal">{o.primaryWarehouseId}</div>
                     </td>
                     <td className="py-3 px-4 font-sans text-slate-200">
@@ -399,10 +413,56 @@ export const OrdersAtRiskPage: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => !isSubmitting && setIsCreateModalOpen(false)}
         title="Book New Customer Order"
-        subtitle="Submit order lines for authoritative backend inventory verification and risk scoring"
-        maxWidth="2xl"
+        subtitle={
+          orderModalTab === 'manual'
+            ? 'Submit order lines for authoritative backend inventory verification and risk scoring'
+            : 'Bulk ingest customer orders via CSV with validation, grouping, and risk scoring'
+        }
+        maxWidth={orderModalTab === 'csv' ? '3xl' : '2xl'}
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
+        {/* Modal Navigation Tabs */}
+        <div className="flex items-center gap-1 border-b border-slate-800 pb-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setOrderModalTab('manual')}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+              orderModalTab === 'manual'
+                ? 'bg-purple-600 text-white shadow-xs'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+            }`}
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            <span>Manual Entry</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setOrderModalTab('csv')}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+              orderModalTab === 'csv'
+                ? 'bg-purple-600 text-white shadow-xs'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Upload CSV</span>
+          </button>
+        </div>
+
+        {orderModalTab === 'csv' ? (
+          <BulkOrderImportTab
+            allowedHubs={distinctHubs}
+            allowedSkus={distinctSKUs}
+            onImportCompleted={importedIds => {
+              setRecentlyImportedIds(prev => new Set([...prev, ...importedIds]));
+              refreshData();
+              setTimeout(() => {
+                setRecentlyImportedIds(new Set());
+              }, 30000);
+            }}
+            onClose={() => setIsCreateModalOpen(false)}
+          />
+        ) : (
+          <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-slate-300 font-medium mb-1">Customer Name *</label>
@@ -583,6 +643,7 @@ export const OrdersAtRiskPage: React.FC = () => {
             </button>
           </div>
         </form>
+        )}
       </Modal>
 
       {/* Modal 2: Edit Order SLA & Attributes */}
