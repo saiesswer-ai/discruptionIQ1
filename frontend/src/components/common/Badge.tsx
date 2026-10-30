@@ -3,24 +3,26 @@ import { DisruptionSeverity, DisruptionStatus, OrderPriority, RiskLevel, PlanSta
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'neutral' | 'success' | 'warning' | 'critical' | 'purple' | 'cyan';
+  variant?: 'neutral' | 'success' | 'warning' | 'critical' | 'purple' | 'cyan' | 'lime' | 'dark';
   size?: 'sm' | 'md';
 }
 
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', size = 'sm' }) => {
-  const sizeClasses = size === 'sm' ? 'text-xs px-2 py-0.5' : 'text-xs px-2.5 py-1';
-  
+  const sizeClasses = size === 'sm' ? 'text-[11px] px-2.5 py-0.5' : 'text-xs px-3 py-1';
+
   const variantClasses = {
-    neutral: 'bg-slate-800/80 text-slate-300 border border-slate-700/60',
-    success: 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50',
-    warning: 'bg-amber-950/60 text-amber-300 border border-amber-800/50',
-    critical: 'bg-rose-950/60 text-rose-300 border border-rose-800/50',
-    purple: 'bg-purple-950/60 text-purple-300 border border-purple-800/50',
-    cyan: 'bg-cyan-950/60 text-cyan-300 border border-cyan-800/50',
+    neutral: 'bg-[#F2F4F0] text-[#4F544D] border border-[#E0E4DC]',
+    success: 'bg-[#EBF9E4] text-[#1D5E0A] border border-[#C5EAB5]',
+    warning: 'bg-[#FEF6E4] text-[#805400] border border-[#F9DC9B]',
+    critical: 'bg-[#FDF0F1] text-[#9E1B26] border border-[#F7B6BC]',
+    purple: 'bg-[#F0EDFF] text-[#4323A0] border border-[#D7CCFE]',
+    cyan: 'bg-[#E8F8FA] text-[#006874] border border-[#B0E9EE]',
+    lime: 'bg-[#F4FFD2] text-[#2C4800] border border-[#C8FF32] font-semibold',
+    dark: 'bg-[#171917] text-[#F7F9F4] border border-[#363936]',
   }[variant];
 
   return (
-    <span className={`inline-flex items-center font-medium rounded tracking-wide ${sizeClasses} ${variantClasses}`}>
+    <span className={`inline-flex items-center font-medium rounded-full tracking-tight transition-colors ${sizeClasses} ${variantClasses}`}>
       {children}
     </span>
   );
@@ -48,7 +50,7 @@ export const StatusBadge: React.FC<{ status: DisruptionStatus }> = ({ status }) 
     case 'evaluating':
       return <Badge variant="warning">Evaluating</Badge>;
     case 'mitigating':
-      return <Badge variant="purple">Mitigating</Badge>;
+      return <Badge variant="lime">Mitigating</Badge>;
     case 'resolved':
       return <Badge variant="success">Resolved</Badge>;
     default:
@@ -93,7 +95,7 @@ export const PlanStatusBadge: React.FC<{ status: PlanStatus }> = ({ status }) =>
     case 'rejected':
       return <Badge variant="critical">Rejected</Badge>;
     case 'executed':
-      return <Badge variant="purple">Executed</Badge>;
+      return <Badge variant="lime">Executed</Badge>;
     default:
       return <Badge variant="neutral">{status}</Badge>;
   }

@@ -86,39 +86,39 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
   return (
     <div className="space-y-4 text-xs font-sans">
       {/* Top action helper bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-950/60 border border-slate-800 rounded-md">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleDownloadTemplate}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700/70 rounded transition-colors"
+            className="btn-secondary py-1.5 px-3 text-xs"
             title="Download blank CSV template with required headers"
           >
-            <Download className="w-3.5 h-3.5 text-purple-400" />
+            <Download className="w-3.5 h-3.5 text-[#777B76]" />
             <span>Download Template</span>
           </button>
           <button
             type="button"
             onClick={handleUseSampleFile}
             disabled={isParsing || isImporting}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-purple-300 hover:text-purple-200 bg-purple-950/40 hover:bg-purple-900/50 border border-purple-800/60 rounded transition-colors"
+            className="btn-secondary py-1.5 px-3 text-xs border-[#C8FF32] bg-[#F4FFD2] text-[#2C4800] hover:bg-[#DFFF83]"
             title="Load built-in sample file (5 rows, 4 orders)"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-purple-400" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[#2C4800]" />
             <span>Use Sample File</span>
           </button>
         </div>
 
         {fileName && (
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-[11px] text-[#777B76] font-mono flex items-center gap-1">
+              <FileText className="w-3.5 h-3.5 text-[#A0A39D]" />
               {fileName}
             </span>
             <button
               type="button"
               onClick={reset}
-              className="text-[11px] text-rose-400 hover:text-rose-300 font-medium"
+              className="text-[11px] text-[#9E1B26] hover:underline font-semibold"
             >
               Reset
             </button>
@@ -136,10 +136,10 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-2xl p-7 text-center cursor-pointer transition-all ${
             isDragOver
-              ? 'border-purple-500 bg-purple-950/20'
-              : 'border-slate-800 hover:border-slate-700 bg-slate-950/40'
+              ? 'border-[#C8FF32] bg-[#F4FFD2]/30'
+              : 'border-[#D1D6CB] hover:border-[#171917] bg-[#F8F9F6]'
           }`}
         >
           <input
@@ -153,20 +153,20 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
             }}
             className="hidden"
           />
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <div className="p-3 bg-purple-900/20 border border-purple-800/50 rounded-full text-purple-400">
+          <div className="flex flex-col items-center justify-center space-y-2.5">
+            <div className="p-3 bg-white border border-[#E8EAE4] rounded-2xl shadow-sm text-[#171917]">
               {isParsing ? (
-                <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#171917]" />
               ) : (
-                <Upload className="w-6 h-6 text-purple-400" />
+                <Upload className="w-6 h-6 text-[#171917]" />
               )}
             </div>
-            <div className="text-slate-200 font-medium text-sm">
+            <div className="text-[#171917] font-bold text-sm">
               {isParsing ? 'Parsing and validating CSV...' : 'Click to browse or drop your CSV order file'}
             </div>
-            <p className="text-[11px] text-slate-500 max-w-sm">
+            <p className="text-[11px] text-[#777B76] max-w-sm leading-relaxed">
               Supports .csv files up to 5 MB (max 500 rows). One row per line item; rows sharing{' '}
-              <span className="font-mono text-purple-300">order_ref</span> group into a single customer order.
+              <span className="font-mono text-[#171917] font-semibold">order_ref</span> group into a single customer order.
             </p>
           </div>
         </div>
@@ -174,12 +174,12 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
 
       {/* Parse Errors Callout */}
       {parseErrors.length > 0 && (
-        <div className="p-3 bg-rose-950/40 border border-rose-800/80 rounded-md space-y-1">
-          <div className="flex items-center gap-1.5 text-rose-400 font-semibold">
+        <div className="p-4 bg-[#FDF0F1] border border-[#F7B6BC] rounded-2xl space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[#9E1B26] font-bold">
             <AlertCircle className="w-4 h-4" />
             <span>CSV Parsing Failed</span>
           </div>
-          <ul className="list-disc list-inside text-rose-300 text-[11px] space-y-0.5">
+          <ul className="list-disc list-inside text-[#9E1B26] text-[11px] space-y-0.5">
             {parseErrors.map((err, idx) => (
               <li key={idx}>{err}</li>
             ))}
@@ -189,8 +189,8 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
 
       {/* Audit Justification Field */}
       <div>
-        <label className="block text-slate-300 font-medium mb-1">
-          Audit Justification / Import Reason <span className="text-rose-400">*</span>
+        <label className="block text-xs font-semibold text-[#171917] mb-1.5">
+          Audit Justification / Import Reason <span className="text-[#9E1B26]">*</span>
         </label>
         <input
           type="text"
@@ -198,9 +198,9 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
           placeholder="e.g. Critical aerospace expansion cluster rollout (required for immutable audit record)"
           value={auditJustification}
           onChange={e => setAuditJustification(e.target.value)}
-          className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-200 focus:outline-none focus:border-purple-500 text-xs"
+          className="w-full bg-[#F8F9F6] border border-[#E8EAE4] rounded-xl px-3.5 py-2 text-[#171917] focus:outline-none focus:border-[#C8FF32] focus:ring-2 focus:ring-[#C8FF32]/50 text-xs"
         />
-        <p className="text-[10px] text-slate-500 mt-1">
+        <p className="text-[10px] text-[#777B76] mt-1">
           Permanently recorded into DisruptionIQ audit trail for governance and SOC2 compliance.
         </p>
       </div>
@@ -208,28 +208,28 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
       {/* Import Result Summary Banner (if completed) */}
       {importResponse && (
         <div
-          className={`p-3 rounded-md border space-y-2 ${
+          className={`p-4 rounded-2xl border space-y-2.5 ${
             importResponse.successfulCount > 0
-              ? 'bg-emerald-950/40 border-emerald-800/80'
-              : 'bg-rose-950/40 border-rose-800/80'
+              ? 'bg-[#EBF9E4] border-[#C5EAB5]'
+              : 'bg-[#FDF0F1] border-[#F7B6BC]'
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {importResponse.successfulCount > 0 ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
               ) : (
-                <XCircle className="w-4 h-4 text-rose-400" />
+                <XCircle className="w-4 h-4 text-[#9E1B26]" />
               )}
-              <span className="font-semibold text-white">
+              <span className="font-bold text-[#171917]">
                 Import Batch Completed:{' '}
-                <span className="text-emerald-400">{importResponse.successfulCount} created</span>
+                <span className="text-[#2E7D32]">{importResponse.successfulCount} created</span>
                 {importResponse.failedCount > 0 && (
-                  <span className="text-rose-400 ml-1">({importResponse.failedCount} rejected/duplicate)</span>
+                  <span className="text-[#9E1B26] ml-1">({importResponse.failedCount} rejected/duplicate)</span>
                 )}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-mono">
+            <span className="text-[10px] text-[#777B76] font-mono">
               Total Processed: {importResponse.totalProcessed}
             </span>
           </div>
@@ -238,21 +238,21 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
             {importResponse.results.map((res, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-2 bg-slate-900/90 rounded border border-slate-800/60"
+                className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-[#E8EAE4]"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-white">{res.orderRef}</span>
+                  <span className="font-mono font-bold text-[#171917]">{res.orderRef}</span>
                   {res.orderId && (
-                    <span className="text-slate-400 font-mono text-[10px]">({res.orderId})</span>
+                    <span className="text-[#777B76] font-mono text-[10px]">({res.orderId})</span>
                   )}
                   {res.riskScore !== undefined && res.riskScore !== null && (
                     <span
-                      className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-medium ${
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
                         res.riskScore >= 70
-                          ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60'
+                          ? 'bg-[#FDF0F1] text-[#9E1B26] border border-[#F7B6BC]'
                           : res.riskScore >= 40
-                          ? 'bg-amber-950/80 text-amber-300 border border-amber-800/60'
-                          : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                          ? 'bg-[#FEF6E4] text-[#805400] border border-[#F9DC9B]'
+                          : 'bg-[#EBF9E4] text-[#1D5E0A] border border-[#C5EAB5]'
                       }`}
                     >
                       Risk {res.riskScore}/100 ({res.riskLevel})
@@ -262,7 +262,7 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
                 <div className="text-right">
                   <span
                     className={
-                      res.success ? 'text-emerald-300' : 'text-rose-300 font-medium'
+                      res.success ? 'text-[#2E7D32] font-semibold' : 'text-[#9E1B26] font-semibold'
                     }
                   >
                     {res.reason}
@@ -276,37 +276,37 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
 
       {/* Grouped Preview Section */}
       {groupingResult && (
-        <div className="space-y-3 pt-2 border-t border-slate-800/80">
+        <div className="space-y-3 pt-2 border-t border-[#E8EAE4]">
           {/* Summary metrics header */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded">
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
+              <div className="text-[10px] text-[#777B76] uppercase tracking-wider font-semibold">
                 Orders Detected
               </div>
-              <div className="text-base font-bold text-white font-mono flex items-center gap-2 mt-0.5">
+              <div className="text-base font-bold text-[#171917] font-mono flex items-center gap-2 mt-0.5">
                 <span>{groupingResult.totals.totalOrders}</span>
-                <span className="text-xs font-normal text-emerald-400">
+                <span className="text-xs font-normal text-[#2E7D32]">
                   ({validCount} Valid
-                  {invalidCount > 0 && <>, <span className="text-rose-400">{invalidCount} Invalid</span></>}
-                  {alreadyImportedCount > 0 && <>, <span className="text-amber-400">{alreadyImportedCount} Already Imported</span></>})
+                  {invalidCount > 0 && <>, <span className="text-[#9E1B26]">{invalidCount} Invalid</span></>}
+                  {alreadyImportedCount > 0 && <>, <span className="text-[#805400]">{alreadyImportedCount} Imported</span></>})
                 </span>
               </div>
             </div>
 
-            <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded">
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+            <div className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
+              <div className="text-[10px] text-[#777B76] uppercase tracking-wider font-semibold">
                 Total Line Items
               </div>
-              <div className="text-base font-bold text-white font-mono mt-0.5">
+              <div className="text-base font-bold text-[#171917] font-mono mt-0.5">
                 {groupingResult.totals.totalLines} lines
               </div>
             </div>
 
-            <div className="p-2.5 bg-slate-950/80 border border-slate-800 rounded">
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+            <div className="p-3 bg-[#F8F9F6] border border-[#E8EAE4] rounded-2xl">
+              <div className="text-[10px] text-[#777B76] uppercase tracking-wider font-semibold">
                 Valid Commitment Value
               </div>
-              <div className="text-base font-bold text-emerald-400 font-mono mt-0.5">
+              <div className="text-base font-bold text-[#2E7D32] font-mono mt-0.5">
                 ${groupingResult.totals.totalValueUSD.toLocaleString()}
               </div>
             </div>
@@ -315,12 +315,12 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
           {/* Table Filter & Error Download toolbar */}
           <div className="flex items-center justify-between text-xs pt-1">
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white select-none">
+              <label className="flex items-center gap-1.5 cursor-pointer text-[#171917] font-medium select-none">
                 <input
                   type="checkbox"
                   checked={filterInvalidOnly}
                   onChange={e => setFilterInvalidOnly(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-purple-600 focus:ring-0 focus:ring-offset-0"
+                  className="rounded border-[#E8EAE4] text-[#171917] focus:ring-0 focus:ring-offset-0"
                 />
                 <span>Show Invalid only ({invalidCount})</span>
               </label>
@@ -330,7 +330,7 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
               <button
                 type="button"
                 onClick={handleDownloadErrors}
-                className="inline-flex items-center gap-1 text-[11px] text-rose-400 hover:text-rose-300 transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] text-[#9E1B26] hover:underline font-semibold transition-colors"
                 title="Download CSV containing row-by-row error details"
               >
                 <Download className="w-3 h-3" />
@@ -342,7 +342,7 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
           {/* Grouped Orders List */}
           <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
             {displayedOrders.length === 0 ? (
-              <div className="py-6 text-center text-slate-500 bg-slate-950/40 rounded border border-slate-800/60">
+              <div className="py-6 text-center text-[#777B76] bg-[#F8F9F6] rounded-2xl border border-[#E8EAE4]">
                 {filterInvalidOnly
                   ? 'No invalid orders found. All orders in this file are valid!'
                   : 'No orders to display.'}
@@ -351,63 +351,63 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
               displayedOrders.map((order, oIdx) => (
                 <div
                   key={oIdx}
-                  className={`p-3 rounded-lg border transition-all ${
+                  className={`p-3.5 rounded-2xl border transition-all ${
                     order.alreadyImported
-                      ? 'bg-amber-950/10 border-amber-900/50'
+                      ? 'bg-[#FEF6E4]/40 border-[#F9DC9B]'
                       : order.isValid
-                      ? 'bg-slate-950/90 border-slate-800/90'
-                      : 'bg-rose-950/15 border-rose-900/60'
+                      ? 'bg-white border-[#E8EAE4]'
+                      : 'bg-[#FDF0F1]/40 border-[#F7B6BC]'
                   }`}
                 >
                   {/* Order header row */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/70">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-[#E8EAE4]">
                     <div className="flex items-center gap-2">
                       {order.alreadyImported ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-950 text-amber-300 border border-amber-700/60">
-                          <History className="w-3 h-3 text-amber-400" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF6E4] text-[#805400] border border-[#F9DC9B]">
+                          <History className="w-3 h-3" />
                           <span>Already Imported</span>
                         </span>
                       ) : order.isValid ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800/60">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF9E4] text-[#1D5E0A] border border-[#C5EAB5]">
+                          <CheckCircle2 className="w-3 h-3" />
                           <span>Valid Order</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-950 text-rose-300 border border-rose-800/60">
-                          <XCircle className="w-3 h-3 text-rose-400" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FDF0F1] text-[#9E1B26] border border-[#F7B6BC]">
+                          <XCircle className="w-3 h-3" />
                           <span>Invalid Order ({order.orderErrors.length || order.lines.filter(l => !l.isValid).length} errors)</span>
                         </span>
                       )}
 
-                      <span className="font-mono font-bold text-white text-xs">
+                      <span className="font-mono font-bold text-[#171917] text-xs">
                         {order.orderRef}
                       </span>
                       {order.alreadyImported && order.existingOrderId && (
-                        <span className="text-[10px] text-amber-400 font-mono">→ {order.existingOrderId}</span>
+                        <span className="text-[10px] text-[#805400] font-mono">→ {order.existingOrderId}</span>
                       )}
-                      <span className="text-slate-300 font-semibold">
+                      <span className="text-[#171917] font-semibold">
                         {order.customerName || 'Missing Customer'}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[10px] text-[#777B76] font-mono">
                         ({order.customerTier || 'Tier?'})
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3 font-mono text-[11px] text-slate-400">
-                      <span>Hub: <strong className="text-slate-200">{order.primaryWarehouseId || '?'}</strong></span>
-                      <span>Priority: <strong className="text-purple-400">{order.priority || '?'}</strong></span>
-                      <span>Policy: <strong className="text-slate-300">{order.fulfillmentPolicy}</strong></span>
-                      <span className="text-emerald-400 font-bold">
+                    <div className="flex items-center gap-3 font-mono text-[11px] text-[#777B76]">
+                      <span>Hub: <strong className="text-[#171917]">{order.primaryWarehouseId || '?'}</strong></span>
+                      <span>Priority: <strong className="text-[#171917]">{order.priority || '?'}</strong></span>
+                      <span>Policy: <strong className="text-[#777B76]">{order.fulfillmentPolicy}</strong></span>
+                      <span className="text-[#2E7D32] font-bold">
                         ${order.totalValueUSD.toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  {/* Order Level Errors (cross-row consistency, duplicate SKU, etc.) */}
+                  {/* Order Level Errors */}
                   {order.orderErrors.length > 0 && (
-                    <div className="mt-2 p-2 bg-rose-950/40 border border-rose-900/60 rounded text-[11px] text-rose-300 space-y-1">
-                      <div className="font-semibold flex items-center gap-1 text-rose-400">
-                        <AlertTriangle className="w-3 h-3" />
+                    <div className="mt-2.5 p-2.5 bg-[#FDF0F1] border border-[#F7B6BC] rounded-xl text-[11px] text-[#9E1B26] space-y-1">
+                      <div className="font-bold flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5" />
                         <span>Order Level Validation Errors:</span>
                       </div>
                       <ul className="list-disc list-inside space-y-0.5">
@@ -419,40 +419,40 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
                   )}
 
                   {/* Order Line Items Table */}
-                  <div className="mt-2 overflow-x-auto">
+                  <div className="mt-2.5 overflow-x-auto">
                     <table className="w-full text-[11px] font-mono">
                       <thead>
-                        <tr className="text-slate-500 border-b border-slate-800/50 text-left">
-                          <th className="py-1 px-1.5 w-12">Row</th>
-                          <th className="py-1 px-2">SKU</th>
-                          <th className="py-1 px-2 text-right">Qty</th>
-                          <th className="py-1 px-2 text-right">Unit Price</th>
-                          <th className="py-1 px-2 text-right">Line Total</th>
-                          <th className="py-1 px-2">Status & Validation</th>
+                        <tr className="text-[#777B76] border-b border-[#E8EAE4] text-left">
+                          <th className="py-1.5 px-2 w-12 font-medium">Row</th>
+                          <th className="py-1.5 px-2 font-medium">SKU</th>
+                          <th className="py-1.5 px-2 text-right font-medium">Qty</th>
+                          <th className="py-1.5 px-2 text-right font-medium">Unit Price</th>
+                          <th className="py-1.5 px-2 text-right font-medium">Line Total</th>
+                          <th className="py-1.5 px-2 font-medium">Status & Validation</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800/30">
+                      <tbody className="divide-y divide-[#E8EAE4]">
                         {order.lines.map((line, lIdx) => (
                           <tr
                             key={lIdx}
-                            className={line.isValid ? 'text-slate-300' : 'text-rose-300 bg-rose-950/20'}
+                            className={line.isValid ? 'text-[#171917]' : 'text-[#9E1B26] bg-[#FDF0F1]/50'}
                           >
-                            <td className="py-1 px-1.5 text-slate-500">#{line.rowNumber}</td>
-                            <td className="py-1 px-2 font-bold text-white">{line.sku || '<blank>'}</td>
-                            <td className="py-1 px-2 text-right">{line.quantity}</td>
-                            <td className="py-1 px-2 text-right">${line.unitPriceUSD.toFixed(2)}</td>
-                            <td className="py-1 px-2 text-right font-semibold text-slate-200">
+                            <td className="py-1.5 px-2 text-[#777B76]">#{line.rowNumber}</td>
+                            <td className="py-1.5 px-2 font-bold text-[#171917]">{line.sku || '<blank>'}</td>
+                            <td className="py-1.5 px-2 text-right">{line.quantity}</td>
+                            <td className="py-1.5 px-2 text-right">${line.unitPriceUSD.toFixed(2)}</td>
+                            <td className="py-1.5 px-2 text-right font-bold text-[#171917]">
                               ${line.lineTotalUSD.toLocaleString()}
                             </td>
-                            <td className="py-1 px-2">
+                            <td className="py-1.5 px-2">
                               {line.isValid ? (
-                                <span className="text-emerald-400 font-sans text-[10px] flex items-center gap-1">
-                                  <CheckCircle2 className="w-2.5 h-2.5" /> OK
+                                <span className="text-[#2E7D32] font-sans text-[10px] font-bold flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> OK
                                 </span>
                               ) : (
                                 <div className="space-y-0.5 font-sans">
                                   {line.errors.map((le, leIdx) => (
-                                    <div key={leIdx} className="text-rose-400 text-[10px]">
+                                    <div key={leIdx} className="text-[#9E1B26] text-[10px]">
                                       • {le}
                                     </div>
                                   ))}
@@ -474,16 +474,16 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
       {/* Import Progress Bar */}
       {isImporting && (
         <div className="space-y-1.5 pt-2">
-          <div className="flex items-center justify-between text-xs text-slate-300">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-400" />
+          <div className="flex items-center justify-between text-xs text-[#171917]">
+            <span className="flex items-center gap-1.5 font-semibold">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#171917]" />
               Executing backend order verification & risk scoring...
             </span>
-            <span className="font-mono text-purple-400 font-bold">{importProgress}%</span>
+            <span className="font-mono text-[#171917] font-bold">{importProgress}%</span>
           </div>
-          <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800">
+          <div className="w-full bg-[#E8EAE4] rounded-full h-2 overflow-hidden">
             <div
-              className="bg-purple-600 h-1.5 rounded-full transition-all duration-300 ease-out"
+              className="bg-[#C8FF32] h-2 rounded-full transition-all duration-300 ease-out shadow-[0_0_8px_#C8FF32]"
               style={{ width: `${importProgress}%` }}
             />
           </div>
@@ -491,12 +491,12 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
       )}
 
       {/* Modal Actions Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+      <div className="flex items-center justify-between pt-3 border-t border-[#E8EAE4]">
         <button
           type="button"
           disabled={isImporting}
           onClick={onClose}
-          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-medium transition-colors"
+          className="btn-secondary"
         >
           Cancel
         </button>
@@ -505,11 +505,7 @@ export const BulkOrderImportTab: React.FC<BulkOrderImportTabProps> = ({
           type="button"
           disabled={validCount === 0 || isImporting || isParsing || !auditJustification.trim()}
           onClick={executeImport}
-          className={`px-5 py-2 rounded font-semibold transition-all inline-flex items-center gap-2 ${
-            validCount > 0 && !isImporting && !isParsing && auditJustification.trim()
-              ? 'bg-purple-600 hover:bg-purple-500 text-white cursor-pointer shadow-sm'
-              : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-800'
-          }`}
+          className="btn-lime"
         >
           {isImporting ? (
             <>

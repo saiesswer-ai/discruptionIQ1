@@ -4,10 +4,7 @@ import {
   RotateCcw,
   Bell,
   Zap,
-  UserCheck,
   ChevronDown,
-  Check,
-  ExternalLink,
 } from 'lucide-react';
 
 export const TopNavbar: React.FC = () => {
@@ -15,7 +12,6 @@ export const TopNavbar: React.FC = () => {
     activePage,
     setActivePage,
     currentUser,
-    resetSimulation,
     unreadNotificationsCount,
     notifications,
     markNotificationRead,
@@ -43,28 +39,28 @@ export const TopNavbar: React.FC = () => {
 
   const pageTitles: Record<PageId, { title: string; subtitle: string }> = {
     'control-tower': { title: 'Control Tower', subtitle: 'Global Logistics Operations & Real-Time Disruption Telemetry' },
-    'disruptions': { title: 'Disruptions Registry', subtitle: 'Ingested Carrier Holds, Supplier Delays & Root Cause Forensics' },
+    'disruptions': { title: 'Disruptions', subtitle: 'Ingested Carrier Holds, Supplier Delays & Root Cause Forensics' },
     'orders-at-risk': { title: 'Orders at Risk', subtitle: 'Customer SLA Exposure & Multi-Tier Stockout Probability' },
     'recovery-arena': { title: 'Recovery Arena', subtitle: 'Simulate, Compare & Authorize Disruption Mitigation Workflows' },
-    'inventory': { title: 'Inventory & Warehouses', subtitle: 'Cross-Hub Stock Allocation, Safety Buffers & Inbound Pipelines' },
-    'shipments': { title: 'Shipments & Suppliers', subtitle: 'Carrier Multi-Modal Tracking & Tier-1 Vendor Performance' },
-    'approvals': { title: 'Approval Inbox', subtitle: 'Authorizations, Expenditure Governance & Plan Sign-Offs' },
-    'notifications': { title: 'Notifications Center', subtitle: 'System Alerts, Risk Breaches & Plan State Transitions' },
-    'audit-trail': { title: 'Immutable Audit Trail', subtitle: 'Tamper-Evident Operations Log & Historical Evidence Ledger' },
-    'settings': { title: 'Settings & API Session', subtitle: 'Authenticated role, backend capabilities & environment status' },
+    'inventory': { title: 'Warehouses & Stock', subtitle: 'Hub Allocation, Safety Stock Thresholds & Movements' },
+    'shipments': { title: 'Shipments & Fleet', subtitle: 'Carrier Multi-Modal Tracking & Tier-1 Vendor Telemetry' },
+    'approvals': { title: 'Approvals', subtitle: 'Authorizations, Expenditure Governance & Plan Sign-Offs' },
+    'notifications': { title: 'Notifications', subtitle: 'System Alerts, Risk Breaches & Plan State Transitions' },
+    'audit-trail': { title: 'Audit Trail', subtitle: 'Tamper-Evident Operations Log & Historical Evidence Ledger' },
+    'settings': { title: 'Settings', subtitle: 'Authenticated role, backend capabilities & environment status' },
   };
 
   return (
-    <header className="h-14 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md px-6 flex items-center justify-between gap-4 sticky top-0 z-40">
+    <header className="h-16 border-b border-[#E8EAE4] bg-[#FFFFFF] px-6 flex items-center justify-between gap-4 sticky top-0 z-40">
       {/* Left: Breadcrumbs / Page Title */}
       <div className="flex items-center gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>DisruptionIQ</span>
-            <span>/</span>
-            <span className="text-slate-200 font-semibold">{pageTitles[activePage].title}</span>
+          <div className="flex items-center gap-2 text-xs text-[#777B76]">
+            <span className="font-medium text-[#777B76]">DisruptionIQ</span>
+            <span className="text-[#C8CCC4]">/</span>
+            <span className="text-[#171917] font-semibold">{pageTitles[activePage].title}</span>
           </div>
-          <p className="text-[11px] text-slate-500 hidden md:block">
+          <p className="text-[11px] text-[#8A9188] hidden md:block">
             {pageTitles[activePage].subtitle}
           </p>
         </div>
@@ -72,142 +68,147 @@ export const TopNavbar: React.FC = () => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Arena Fast Launch Button (if not on Arena) */}
-        {activePage !== 'recovery-arena' && (
-          <button
-            onClick={() => setActivePage('recovery-arena')}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-200 bg-purple-950/70 hover:bg-purple-900 border border-purple-700/60 rounded-md transition-colors"
-          >
-            <Zap className="w-3.5 h-3.5 text-purple-400" />
-            <span>Launch Arena</span>
-          </button>
-        )}
-
-        {/* Reset is unavailable unless the backend adds a reset endpoint. */}
+        {/* Recovery Arena Fast Launch Pill Button */}
         <button
-          onClick={resetSimulation}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-md transition-colors"
-          title="The connected backend does not currently expose a reset endpoint"
+          onClick={() => setActivePage('recovery-arena')}
+          className="bg-[#C8FF32] hover:bg-[#DFFF83] text-[#080908] font-bold text-xs px-4 py-2 rounded-full inline-flex items-center gap-1.5 transition-all shadow-sm"
+          title="Launch AI Recovery Arena"
         >
-          <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-          <span className="hidden sm:inline">Reset unavailable</span>
+          <Zap className="w-3.5 h-3.5 text-[#080908] fill-[#080908]" />
+          <span>Recovery Arena</span>
         </button>
 
-        {/* Authenticated role display */}
+        {/* Authenticated role display pill */}
         <div className="relative" ref={roleDropdownRef}>
           <button
             onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-            className="flex items-center gap-2 px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-md text-xs text-slate-200 transition-colors"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] rounded-full text-xs text-[#171917] transition-colors"
           >
-            <UserCheck className="w-3.5 h-3.5 text-sky-400" />
-            <div className="text-left hidden sm:block">
-              <span className="text-slate-400">Role: </span>
-              <span className="font-semibold text-white">{currentUser.roleLabel}</span>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            <span className="w-2 h-2 rounded-full bg-[#84E344]" />
+            <span className="font-medium text-[#444843]">Role:</span>
+            <span className="font-semibold text-[#171917] capitalize">{currentUser.roleLabel.toLowerCase()}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-[#777B76]" />
           </button>
 
           {roleDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-lg shadow-xl py-1 z-50 text-xs">
-              <div className="px-3 py-2 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Authenticated backend role
+            <div className="absolute right-0 mt-2 w-72 card-light p-3 shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="p-2 border-b border-[#F0F1EE]">
+                <div className="text-xs font-semibold text-[#171917]">Authenticated Session</div>
+                <div className="text-[11px] text-[#777B76] mt-0.5">Role permissions are verified on every request.</div>
               </div>
-              {[currentUser].map(u => {
-                const isSelected = true;
-                return (
-                  <button
-                    key={u.role}
-                    onClick={() => setRoleDropdownOpen(false)}
-                    className={`w-full flex items-start gap-2.5 px-3 py-2.5 text-left hover:bg-slate-800/80 transition-colors ${
-                      isSelected ? 'bg-purple-950/40 text-purple-200' : 'text-slate-300'
-                    }`}
-                  >
-                    <div className="w-5 h-5 rounded bg-slate-800 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                      {isSelected ? <Check className="w-3.5 h-3.5 text-purple-400" /> : u.avatarInitials}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-white">{u.roleLabel}</div>
-                      <div className="text-[10px] text-slate-400">
-                        {u.approvalLimitUSD > 0
-                          ? `Approval Cap: $${u.approvalLimitUSD.toLocaleString()}`
-                          : 'Simulation & Proposal Authority'}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+              <div className="p-2 text-xs space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-[#777B76]">User:</span>
+                  <span className="font-semibold text-[#171917]">{currentUser.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#777B76]">Role:</span>
+                  <span className="font-semibold text-[#171917] capitalize">{currentUser.roleLabel}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#777B76]">Approval Limit:</span>
+                  <span className="font-mono font-semibold text-[#171917]">
+                    {currentUser.approvalLimitUSD > 0
+                      ? `$${currentUser.approvalLimitUSD.toLocaleString()}`
+                      : 'None (Proposal Only)'}
+                  </span>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-[#F0F1EE]">
+                <button
+                  onClick={() => {
+                    setRoleDropdownOpen(false);
+                    setActivePage('settings');
+                  }}
+                  className="w-full text-center text-xs text-[#171917] font-semibold py-1.5 bg-[#F8F9F6] hover:bg-[#F0F1EE] border border-[#E8EAE4] rounded-lg transition-colors"
+                >
+                  Manage Role in Settings
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Notifications Popover Toggle */}
+        {/* Notifications Icon Button */}
         <div className="relative" ref={notifDropdownRef}>
           <button
             onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-            className="relative p-2 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors"
-            aria-label="View notifications"
+            className="relative p-2 rounded-xl bg-white hover:bg-[#F8F9F6] border border-[#E8EAE4] text-[#171917] transition-colors"
+            title="Notifications"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-4 h-4 text-[#4F544D]" />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white font-mono text-[9px] flex items-center justify-center font-bold">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C8FF32] text-[#080908] text-[9px] font-bold font-mono flex items-center justify-center border border-[#080908]">
                 {unreadNotificationsCount}
               </span>
             )}
           </button>
 
           {notifDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-lg shadow-xl z-50 overflow-hidden text-xs">
-              <div className="px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
-                <span className="font-semibold text-white">Notifications ({unreadNotificationsCount} unread)</span>
+            <div className="absolute right-0 mt-2 w-80 card-light p-0 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="p-3.5 border-b border-[#F0F1EE] flex items-center justify-between bg-[#FAFAFA]">
+                <div className="text-xs font-semibold text-[#171917] flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5 text-[#171917]" />
+                  <span>Notifications</span>
+                  {unreadNotificationsCount > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#F4FFD2] text-[#2C4800] border border-[#C8FF32] font-semibold">
+                      {unreadNotificationsCount} new
+                    </span>
+                  )}
+                </div>
                 {unreadNotificationsCount > 0 && (
                   <button
-                    onClick={markAllNotificationsRead}
-                    className="text-[11px] text-sky-400 hover:text-sky-300"
+                    onClick={() => markAllNotificationsRead()}
+                    className="text-[11px] text-[#4F544D] hover:text-[#171917] font-medium"
                   >
                     Mark all read
                   </button>
                 )}
               </div>
 
-              <div className="max-h-72 overflow-y-auto divide-y divide-slate-800/60">
-                {notifications.slice(0, 5).map(n => (
-                  <div
-                    key={n.id}
-                    onClick={() => {
-                      markNotificationRead(n.id);
-                      if (n.linkedEntityType === 'disruption' && n.linkedEntityId) {
-                        setInspectDisruptionId(n.linkedEntityId);
-                      } else if (n.linkedEntityType === 'approval') {
-                        setActivePage('approvals');
-                      }
-                      setNotifDropdownOpen(false);
-                    }}
-                    className={`p-3 cursor-pointer hover:bg-slate-800/60 transition-colors ${
-                      !n.read ? 'bg-slate-850/60' : 'opacity-80'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="font-medium text-slate-200 truncate">{n.title}</span>
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />}
-                    </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-2">{n.message}</p>
-                    <span className="text-[10px] text-slate-500 font-mono mt-1 block">
-                      {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+              <div className="max-h-72 overflow-y-auto divide-y divide-[#F0F1EE]">
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-[#777B76]">
+                    No notifications at this time
                   </div>
-                ))}
+                ) : (
+                  notifications.slice(0, 5).map(n => (
+                    <div
+                      key={n.id}
+                      onClick={() => {
+                        markNotificationRead(n.id);
+                        if (n.linkedEntityType === 'disruption' && n.linkedEntityId) {
+                          setInspectDisruptionId(n.linkedEntityId);
+                        } else if (n.linkedEntityType === 'approval') {
+                          setActivePage('approvals');
+                        } else if (n.linkedEntityType === 'plan') {
+                          setActivePage('recovery-arena');
+                        }
+                        setNotifDropdownOpen(false);
+                      }}
+                      className={`p-3 text-xs cursor-pointer hover:bg-[#F8F9F6] transition-colors ${
+                        !n.read ? 'bg-[#F9FCF2]' : ''
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="font-medium text-[#171917] truncate">{n.title}</div>
+                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#C8FF32] shrink-0 mt-1 border border-[#171917]" />}
+                      </div>
+                      <div className="text-[11px] text-[#777B76] mt-0.5 line-clamp-2">{n.message}</div>
+                    </div>
+                  ))
+                )}
               </div>
 
-              <div className="p-2 border-t border-slate-800 bg-slate-950 text-center">
+              <div className="p-2 border-t border-[#F0F1EE] bg-[#FAFAFA]">
                 <button
                   onClick={() => {
-                    setActivePage('notifications');
                     setNotifDropdownOpen(false);
+                    setActivePage('notifications');
                   }}
-                  className="text-xs text-purple-400 hover:text-purple-300 font-medium inline-flex items-center gap-1"
+                  className="w-full text-center text-xs font-semibold text-[#171917] py-1.5 hover:bg-[#F0F1EE] rounded-lg transition-colors"
                 >
-                  <span>Open Full Notification Center</span>
-                  <ExternalLink className="w-3 h-3" />
+                  View All Notifications
                 </button>
               </div>
             </div>

@@ -324,17 +324,17 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#080908]/75 backdrop-blur-md animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-label={`Live tracking modal for ${shipment.trackingNumber}`}
     >
-      <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="w-full max-w-4xl bg-[#171917] border border-[#2E332E] rounded-3xl shadow-2xl text-[#F7F9F4] flex flex-col max-h-[92vh] overflow-hidden">
         {/* Modal Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-slate-800 gap-3 bg-slate-950/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-[#2E332E] gap-3 bg-[#0E100E]">
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="font-mono text-base font-bold text-white tracking-tight">
+              <span className="font-mono text-base font-bold text-[#F7F9F4] tracking-tight">
                 {shipment.trackingNumber}
               </span>
               <span className="text-xs text-slate-400 font-sans font-medium">
@@ -342,10 +342,10 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
               </span>
 
               {/* Simulated Live Badge */}
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/50 text-emerald-400 text-[10px] font-semibold tracking-wider uppercase shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C8FF32]/10 border border-[#C8FF32]/30 text-[#C8FF32] text-[10px] font-semibold tracking-wider uppercase shadow-xs">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C8FF32] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C8FF32]"></span>
                 </span>
                 Simulated Live
               </span>
@@ -392,14 +392,14 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
             <button
               onClick={handleRecenter}
               title="Reset view bounds"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#242624] hover:bg-[#2E322E] text-[#F7F9F4] border border-[#363936] text-xs font-medium transition-colors"
             >
               <Navigation className="w-3.5 h-3.5" />
               <span>Fit Route</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-xl text-[#A0A39D] hover:text-white hover:bg-[#242624] transition-colors"
               aria-label="Close live tracking dialog"
             >
               <X className="w-4 h-4" />
@@ -441,7 +441,7 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
           )}
 
           {/* Route Progress indicator */}
-          <div className="bg-slate-950/60 border border-slate-800 rounded-md px-3 py-2 flex items-center justify-between text-[11px]">
+          <div className="bg-[#080908] border border-[#2B2E2B] rounded-2xl px-3 py-2 flex items-center justify-between text-[11px]">
             <div className="flex items-center gap-2">
               <span className="text-slate-400">Corridor Mode:</span>
               <span className="font-semibold text-white">
@@ -449,7 +449,7 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
               </span>
               <span className="text-slate-600">•</span>
               <span className="text-slate-400">Route Progress:</span>
-              <span className="font-mono text-purple-400 font-semibold">{progressPercent}%</span>
+              <span className="font-mono text-[#C8FF32] font-bold">{progressPercent}%</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -463,10 +463,10 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
           </div>
 
           {/* Interactive Leaflet Map Container */}
-          <div className="relative w-full h-[430px] rounded-lg border border-slate-800 overflow-hidden bg-slate-950">
+          <div className="relative w-full h-[430px] rounded-2xl border border-[#2B2E2B] overflow-hidden bg-[#080908]">
             {isLoading && (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-xs text-slate-300 space-y-2">
-                <RefreshCw className="w-6 h-6 animate-spin text-purple-500" />
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#080908]/75 backdrop-blur-md text-slate-300 space-y-2">
+                <RefreshCw className="w-6 h-6 animate-spin text-[#C8FF32]" />
                 <span className="text-xs font-medium">Computing route geometry and telemetry...</span>
               </div>
             )}
@@ -486,9 +486,9 @@ export const LiveLocationModal: React.FC<LiveLocationModalProps> = ({
             />
 
             {/* Visual Legend Overlay */}
-            <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 border border-slate-800/90 rounded-md p-2 text-[10px] text-slate-300 flex items-center gap-3 backdrop-blur-xs shadow-lg">
+            <div className="absolute bottom-3 left-3 z-20 bg-[#171917]/90 border border-[#363936] rounded-xl p-2.5 text-[10px] text-slate-300 flex items-center gap-3 backdrop-blur-xs shadow-lg">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C8FF32] inline-block"></span>
                 <span>Origin</span>
               </div>
               <div className="flex items-center gap-1.5">

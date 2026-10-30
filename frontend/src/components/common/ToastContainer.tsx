@@ -8,32 +8,32 @@ export const ToastContainer: React.FC = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none">
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none">
       {toasts.map(toast => {
         const icon = {
-          success: <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />,
-          warning: <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />,
-          error: <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />,
-          info: <Info className="w-4 h-4 text-sky-400 shrink-0" />,
+          success: <CheckCircle2 className="w-4 h-4 text-[#2E7D32] shrink-0" />,
+          warning: <AlertTriangle className="w-4 h-4 text-[#B78103] shrink-0" />,
+          error: <AlertCircle className="w-4 h-4 text-[#C62828] shrink-0" />,
+          info: <Info className="w-4 h-4 text-[#7185FF] shrink-0" />,
         }[toast.type];
 
-        const borderClass = {
-          success: 'border-emerald-800/80 bg-slate-900',
-          warning: 'border-amber-800/80 bg-slate-900',
-          error: 'border-rose-800/80 bg-slate-900',
-          info: 'border-slate-700 bg-slate-900',
+        const cardStyle = {
+          success: 'bg-[#FFFFFF] border-[#C5EAB5] text-[#171917] shadow-lg shadow-[#84E344]/5',
+          warning: 'bg-[#FFFFFF] border-[#F9DC9B] text-[#171917] shadow-lg shadow-[#F5C451]/5',
+          error: 'bg-[#FFFFFF] border-[#F7B6BC] text-[#171917] shadow-lg shadow-[#E85D68]/5',
+          info: 'bg-[#FFFFFF] border-[#E8EAE4] text-[#171917] shadow-lg',
         }[toast.type];
 
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-lg border shadow-lg text-xs text-slate-200 animate-in slide-in-from-bottom-2 duration-150 ${borderClass}`}
+            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-2xl border text-xs font-medium animate-in slide-in-from-bottom-2 duration-150 ${cardStyle}`}
           >
             {icon}
             <div className="flex-1 leading-relaxed">{toast.message}</div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-500 hover:text-slate-300 p-0.5"
+              className="text-[#777B76] hover:text-[#171917] p-0.5 rounded-lg transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>

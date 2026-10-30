@@ -2,19 +2,50 @@
 @import "leaflet/dist/leaflet.css";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  
-  --color-slate-925: #0b1120;
-  --color-slate-950: #070d17;
-  --color-navy-900: #0a1128;
-  --color-navy-950: #050914;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Neon Lime Accents */
+  --color-lime-accent: #C8FF32;
+  --color-lime-highlight: #DFFF83;
+  --color-lime-pale: #F0FFCC;
+  --color-lime-dark: #AEE018;
+
+  /* Dark Feature Surfaces */
+  --color-dark-pure: #080908;
+  --color-dark-charcoal: #171917;
+  --color-dark-surface: #242624;
+  --color-dark-elevated: #2D302D;
+
+  /* Light Surfaces */
+  --color-light-white: #FFFFFF;
+  --color-light-soft: #F8F9F6;
+  --color-light-subtle: #F0F1EE;
+  --color-light-border: #E8EAE4;
+
+  /* Backgrounds */
+  --color-lavender-bg: #F0EDFF;
+  --color-lavender-soft: #F6F4FF;
+  --color-app-bg: #F7F8F5;
+
+  /* Typography */
+  --color-text-primary: #171917;
+  --color-text-secondary: #777B76;
+  --color-text-muted: #A0A39D;
+  --color-text-dark: #F7F9F4;
+
+  /* Semantic */
+  --color-semantic-success: #84E344;
+  --color-semantic-warning: #F5C451;
+  --color-semantic-error: #E85D68;
+  --color-semantic-info: #7185FF;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #070d17;
-  color: #e2e8f0;
+  background-color: #F0EDFF;
+  color: #171917;
+  overflow-x: hidden;
 }
 
 /* Custom subtle scrollbar */
@@ -23,17 +54,190 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b1120;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #25334d;
-  border-radius: 3px;
+  background: #D8DCD3;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b4e6e;
+  background: #BCC1B6;
 }
 
-/* Fix Leaflet tiles broken by Tailwind reset (img { max-width: 100%; height: auto; }) */
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #363936;
+}
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4C524C;
+}
+
+/* Glassmorphism & Card Utilities */
+.card-light {
+  background-color: #FFFFFF;
+  border: 1px solid #E8EAE4;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(23, 25, 23, 0.03), 0 2px 6px -1px rgba(23, 25, 23, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-light-interactive {
+  background-color: #FFFFFF;
+  border: 1px solid #E8EAE4;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(23, 25, 23, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-light-interactive:hover {
+  border-color: #D3D8CE;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px -4px rgba(23, 25, 23, 0.06);
+}
+
+.card-dark {
+  background-color: #171917;
+  color: #F7F9F4;
+  border: 1px solid #2B2E2B;
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 30px -4px rgba(8, 9, 8, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hero {
+  background: radial-gradient(circle at 50% 120%, rgba(200, 255, 50, 0.08) 0%, rgba(23, 25, 23, 1) 60%), #080908;
+  color: #F7F9F4;
+  border: 1px solid #2E332E;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 40px -10px rgba(8, 9, 8, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Button Utilities */
+.btn-lime {
+  background-color: #C8FF32;
+  color: #080908;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 2px 8px rgba(200, 255, 50, 0.25);
+  border: 1px solid rgba(200, 255, 50, 0.4);
+}
+.btn-lime:hover:not(:disabled) {
+  background-color: #DFFF83;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200, 255, 50, 0.45);
+}
+.btn-lime:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #171917;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  border: 1px solid #E8EAE4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease-in-out;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: #F8F9F6;
+  border-color: #D4D8CE;
+  color: #080908;
+}
+
+.btn-dark {
+  background-color: #242624;
+  color: #F7F9F4;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  border: 1px solid #363936;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s ease-in-out;
+}
+.btn-dark:hover:not(:disabled) {
+  background-color: #2E322E;
+  border-color: #4A504A;
+  color: #FFFFFF;
+}
+
+.input-insight {
+  background-color: #FFFFFF;
+  border: 1px solid #E8EAE4;
+  border-radius: 0.75rem;
+  color: #171917;
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.15s ease-in-out;
+}
+.input-insight:focus {
+  outline: none;
+  border-color: #C8FF32;
+  box-shadow: 0 0 0 3px rgba(200, 255, 50, 0.25);
+}
+
+.input-insight-dark {
+  background-color: #080908;
+  border: 1px solid #363936;
+  border-radius: 0.75rem;
+  color: #F7F9F4;
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.15s ease-in-out;
+}
+.input-insight-dark:focus {
+  outline: none;
+  border-color: #C8FF32;
+  box-shadow: 0 0 0 3px rgba(200, 255, 50, 0.2);
+}
+
+/* AI Orb Graphic Element */
+.ai-orb-glow {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #DFFF83 0%, #C8FF32 40%, rgba(200, 255, 50, 0.2) 80%, transparent 100%);
+  filter: drop-shadow(0 0 10px rgba(200, 255, 50, 0.6));
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+.ai-orb-animated {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-orb-animated {
+    animation: none;
+  }
+}
+
+/* Fix Leaflet tiles */
 .leaflet-container img.leaflet-tile {
   max-width: none !important;
   max-height: none !important;
@@ -54,5 +258,6 @@ body {
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #090d16 !important;
+  background: #171917 !important;
+  border-radius: 1rem;
 }
