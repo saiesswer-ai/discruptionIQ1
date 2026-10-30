@@ -59,7 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         return JSONResponse(
             status_code=exc.status_code,
-            content={"error": body.model_dump(mode="json")},
+            content={"error": body.model_dump(mode="json"), "detail": exc.detail},
             headers=exc.headers,
         )
 

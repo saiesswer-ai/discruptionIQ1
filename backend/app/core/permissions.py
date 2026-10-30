@@ -17,6 +17,8 @@ class Permission(str, Enum):
     SUPPLIERS_READ = "suppliers:read"
     APPROVALS_READ = "approvals:read"
     AUDIT_READ = "audit:read"
+    WAREHOUSES_READ = "warehouses:read"
+    TRANSFERS_READ = "transfers:read"
 
     # Recovery Plan lifecycle actions
     PLANS_CREATE = "plans:create"
@@ -40,6 +42,14 @@ class Permission(str, Enum):
     SHIPMENTS_WRITE = "shipments:write"
     SUPPLIERS_WRITE = "suppliers:write"
     ORDERS_WRITE = "orders:write"
+    WAREHOUSES_WRITE = "warehouses:write"
+    PRODUCTS_WRITE = "products:write"
+
+    # Stock Transfer Lifecycle Permissions
+    TRANSFERS_REQUEST = "transfers:request"
+    TRANSFERS_APPROVE = "transfers:approve"
+    TRANSFERS_DISPATCH = "transfers:dispatch"
+    TRANSFERS_RECEIVE = "transfers:receive"
 
     # Administrative
     ADMIN_ALL = "admin:all"
@@ -84,6 +94,9 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.SUPPLIERS_READ,
         Permission.APPROVALS_READ,
         Permission.AUDIT_READ,
+        Permission.WAREHOUSES_READ,
+        Permission.TRANSFERS_READ,
+        Permission.TRANSFERS_REQUEST,
         Permission.PLANS_CREATE,
         Permission.PLANS_READ,
         Permission.PLANS_SIMULATE,
@@ -103,6 +116,11 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.ORDERS_READ,
         Permission.INVENTORY_READ,
         Permission.SHIPMENTS_READ,
+        Permission.WAREHOUSES_READ,
+        Permission.TRANSFERS_READ,
+        Permission.TRANSFERS_REQUEST,
+        Permission.TRANSFERS_DISPATCH,
+        Permission.TRANSFERS_RECEIVE,
         Permission.PLANS_READ,
         Permission.PLANS_EXECUTE,  # Warehouse operators can execute approved warehouse picks
         Permission.INVENTORY_WRITE,
@@ -116,6 +134,14 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.SUPPLIERS_READ,
         Permission.APPROVALS_READ,
         Permission.AUDIT_READ,
+        Permission.WAREHOUSES_READ,
+        Permission.WAREHOUSES_WRITE,
+        Permission.TRANSFERS_READ,
+        Permission.TRANSFERS_REQUEST,
+        Permission.TRANSFERS_APPROVE,
+        Permission.TRANSFERS_DISPATCH,
+        Permission.TRANSFERS_RECEIVE,
+        Permission.PRODUCTS_WRITE,
         Permission.PLANS_CREATE,
         Permission.PLANS_READ,
         Permission.PLANS_SIMULATE,
@@ -142,6 +168,9 @@ ROLE_PERMISSIONS: dict[str, set[Permission]] = {
         Permission.SUPPLIERS_READ,
         Permission.APPROVALS_READ,
         Permission.AUDIT_READ,
+        Permission.WAREHOUSES_READ,
+        Permission.TRANSFERS_READ,
+        Permission.TRANSFERS_APPROVE,
         Permission.PLANS_READ,
         Permission.PLANS_APPROVE_STANDARD,
         Permission.PLANS_APPROVE_PROCUREMENT,  # Authorised to approve external purchases & alt-sourcing

@@ -30,6 +30,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(32), index=True)
     password_hash: Mapped[str] = mapped_column(String(256))
     approval_limit_usd: Mapped[float] = mapped_column(Numeric(14, 2), default=0.0)
+    assigned_warehouse_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime)
     updated_at: Mapped[datetime] = mapped_column(DateTime)

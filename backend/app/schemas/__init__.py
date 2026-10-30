@@ -8,7 +8,25 @@ from app.schemas.plan import (
     PlanConstraintItem,
     SimulationDetails,
 )
-from app.schemas.inventory import WarehouseInventory, InventoryAdjustmentRequest, StockMovementRequest
+from app.schemas.inventory import (
+    WarehouseInventory,
+    InventoryAdjustmentRequest,
+    StockMovementRequest,
+    WarehouseSchema,
+    WarehouseCreatePayload,
+    WarehouseUpdatePayload,
+    CompanySchema,
+    ProductSchema,
+    ProductCreatePayload,
+    TransferRequestPayload,
+    TransferApprovalPayload,
+    TransferActionPayload,
+    WarehouseTransferSchema,
+    StockMovementSchema,
+    ShortageAnalysisItem,
+    InventoryCreateRequest,
+    StockReceiptRequest,
+)
 from app.schemas.shipment import Shipment, ShipmentCreate, ShipmentUpdate
 from app.schemas.supplier import Supplier, SupplierIssueCreate
 from app.schemas.approval import ApprovalRequest

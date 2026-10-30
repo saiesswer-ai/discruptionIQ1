@@ -12,6 +12,7 @@ from app.api.deps import get_current_user
 from app.api.v1.ai import ai_router
 from app.api.v1.auth import auth_router
 from app.api.v1.recovery_arena import recovery_router
+from app.api.v1.warehouses import warehouses_router
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.permissions import Permission, role_has_permission
@@ -55,6 +56,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 api_router.include_router(auth_router)
 api_router.include_router(recovery_router)
 api_router.include_router(ai_router)
+api_router.include_router(warehouses_router)
 
 
 def _check_perm(user: User, perm: Permission) -> None:

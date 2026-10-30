@@ -557,6 +557,11 @@ def main() -> None:
         action="store_true",
         help="Add only missing baseline canonical disruptions; preserve all existing operational records.",
     )
+    parser.add_argument(
+        "--synthetic-company",
+        action="store_true",
+        help="Seed or verify the synthetic demonstration company: DisruptionIQ Logistics Pvt. Ltd.",
+    )
     args = parser.parse_args()
     print(f"Database Target: {database.engine.url}")
     if args.users_only:
@@ -565,6 +570,10 @@ def main() -> None:
     elif args.disruptions_only:
         counts = provision_canonical_disruptions()
         print("\n[OK] Canonical disruptions provisioning complete:")
+    elif args.synthetic_company:
+        from app.scripts.seed_synthetic_company import seed_synthetic_company
+        counts = seed_synthetic_company()
+        print("\n[OK] Synthetic demonstration company loaded:")
     else:
         print(f"Loading synthetic datasets from: {DATASETS_DIR}")
         counts = seed_database()

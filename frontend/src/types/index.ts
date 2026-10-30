@@ -271,3 +271,135 @@ export interface SimulationScenario {
   keyDisruptionId: string;
   description: string;
 }
+
+// ---------------------------------------------------------------------------
+// Synthetic Company, Warehouse Management, and Stock Transfer Types
+// ---------------------------------------------------------------------------
+
+export interface Company {
+  id: string;
+  name: string;
+  code: string;
+  headquarters: string;
+  registrationNumber?: string;
+  country: string;
+  isDemo: boolean;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface WarehouseEntity {
+  id: string;
+  name: string;
+  location: string;
+  country: string;
+  city?: string;
+  companyId?: string;
+  isDemo: boolean;
+  totalCapacitySqm: number;
+  availableDockDoors: number;
+  managerName?: string;
+  contactEmail?: string;
+  status?: string;
+  operatingStatus?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  inventoryCount?: number;
+  totalUnits?: number;
+  capacityUtilizationPct?: number;
+}
+
+export interface CompanyDetail {
+  company: Company;
+  warehouses: WarehouseEntity[];
+  totalCapacitySqm: number;
+  totalDockDoors: number;
+  totalTrackedSKUs: number;
+  totalInventoryUnits: number;
+}
+
+export interface ProductItem {
+  sku: string;
+  name: string;
+  description?: string;
+  category: string;
+  unitCostUSD: number;
+  dimensionsCm?: string;
+  weightKg?: number;
+  isDemo: boolean;
+  createdAt?: string;
+}
+
+export type TransferStatus = 'REQUESTED' | 'APPROVED' | 'IN_TRANSIT' | 'RECEIVED' | 'CANCELLED';
+
+export interface WarehouseTransferItem {
+  id: string;
+  companyId?: string;
+  sourceWarehouseId: string;
+  sourceWarehouseName?: string;
+  destinationWarehouseId: string;
+  destinationWarehouseName?: string;
+  sku: string;
+  skuName?: string;
+  quantity: number;
+  status: TransferStatus;
+  reason: string;
+  requestedBy: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  dispatchedAt?: string;
+  receivedAt?: string;
+  expectedArrival?: string;
+  notes?: string;
+  isDemo: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockMovementItem {
+  id: string;
+  movementType: string;
+  fromWarehouseId?: string;
+  fromWarehouseName?: string;
+  toWarehouseId?: string;
+  toWarehouseName?: string;
+  sku: string;
+  quantity: number;
+  reason: string;
+  reference?: string;
+  actorId?: string;
+  actorRole?: string;
+  isDemo: boolean;
+  timestamp: string;
+}
+
+export interface ShortageItem {
+  warehouseId: string;
+  warehouseName: string;
+  warehouseLocation: string;
+  sku: string;
+  skuDescription: string;
+  category: string;
+  onHandUnits: number;
+  availableUnits: number;
+  reservedUnits: number;
+  inboundUnits: number;
+  safetyStockThreshold: number;
+  deficitUnits: number;
+  severity: 'critical' | 'depleted' | 'constrained';
+  affectedOrdersCount: number;
+  recommendedAction: string;
+}
+
+export interface WarehouseDetailResponse {
+  warehouse: WarehouseEntity;
+  company?: Company;
+  inventory: WarehouseInventory[];
+  incomingShipments: Shipment[];
+  outgoingOrders: OrderAtRisk[];
+  shortages: ShortageItem[];
+  transfers: WarehouseTransferItem[];
+  disruptions: Disruption[];
+  movements: StockMovementItem[];
+}
+

@@ -1,5 +1,23 @@
 /** Typed HTTP boundary for the FastAPI service. Operational data is never mocked here. */
-import { ApprovalRequest, AuditLogEntry, Disruption, OrderAtRisk, RecoveryPlan, Shipment, Supplier, UserProfile, WarehouseInventory } from '../types';
+import {
+  ApprovalRequest,
+  AuditLogEntry,
+  Company,
+  CompanyDetail,
+  Disruption,
+  OrderAtRisk,
+  ProductItem,
+  RecoveryPlan,
+  Shipment,
+  ShortageItem,
+  StockMovementItem,
+  Supplier,
+  UserProfile,
+  WarehouseDetailResponse,
+  WarehouseEntity,
+  WarehouseInventory,
+  WarehouseTransferItem,
+} from '../types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1').replace(/\/$/, '');
 const TOKEN_KEY = 'disruptioniq.accessToken';
@@ -123,6 +141,65 @@ export interface UpdateOrderPayload {
   reason: string;
 }
 
+export interface CreateWarehousePayload {
+  name: string;
+  location: string;
+  country: string;
+  city?: string;
+  companyId?: string;
+  totalCapacitySqm: number;
+  availableDockDoors: number;
+  managerName?: string;
+  contactEmail?: string;
+}
+
+export interface UpdateWarehousePayload {
+  name?: string;
+  location?: string;
+  totalCapacitySqm?: number;
+  availableDockDoors?: number;
+  managerName?: string;
+  contactEmail?: string;
+  status?: string;
+  operatingStatus?: string;
+}
+
+export interface CreateProductPayload {
+  sku: string;
+  name: string;
+  category: string;
+  unitCostUSD: number;
+  description?: string;
+  dimensionsCm?: string;
+  weightKg?: number;
+}
+
+export interface CreateInventorySlotPayload {
+  warehouseId: string;
+  sku: string;
+  onHandUnits: number;
+  safetyStockThreshold: number;
+  unitCostUSD: number;
+}
+
+export interface RecordStockReceiptPayload {
+  warehouseId: string;
+  sku: string;
+  quantity: number;
+  receiptReference: string;
+  notes?: string;
+}
+
+export interface TransferRequestPayload {
+  sourceWarehouseId: string;
+  destinationWarehouseId: string;
+  sku: string;
+  quantity: number;
+  reason: string;
+  expectedArrival?: string;
+  authorizationInfo?: string;
+}
+
 export const toUserProfile = (user: AuthUserResponse): UserProfile => ({
   id: user.id, name: user.fullName, role: user.role, roleLabel: user.role.replaceAll('_', ' '), approvalLimitUSD: user.approvalLimitUSD,
   avatarInitials: user.fullName.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(), permissions: user.permissions,
@@ -181,6 +258,50 @@ class FastApiClient {
   approvePlan(planId: string, comments = '') { return this.request<{ plan: RecoveryPlan; approval: ApprovalRequest }>(`/recovery/plans/${encodeURIComponent(planId)}/approve`, { method: 'POST', body: JSON.stringify({ comments }) }); }
   rejectPlan(planId: string, reason: string) { return this.request<{ plan: RecoveryPlan; approval: ApprovalRequest }>(`/recovery/plans/${encodeURIComponent(planId)}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }); }
   executePlan(planId: string) { return this.request<RecoveryPlan>(`/recovery/plans/${encodeURIComponent(planId)}/execute`, { method: 'POST', body: JSON.stringify({ idempotencyKey: crypto.randomUUID() }) }); }
+
+  // Synthetic Company & Warehouse Management
+  getCompanies() { return this.request<Company[]>('/companies'); }
+  getCompany(id: string) { return this.request<CompanyDetail>(`/companies/${encodeURIComponent(id)}`); }
+  getWarehouses(companyId?: string) {
+    const query = companyId ? `?company_id=${encodeURIComponent(companyId)}` : '';
+    return this.request<WarehouseEntity[]>(`/warehouses${query}`);
+  }
+  getWarehouse(id: string) { return this.request<WarehouseDetailResponse>(`/warehouses/${encodeURIComponent(id)}`); }
+  createWarehouse(data: CreateWarehousePayload) { return this.request<WarehouseEntity>('/warehouses', { method: 'POST', body: JSON.stringify(data) }); }
+  updateWarehouse(id: string, data: UpdateWarehousePayload) { return this.request<WarehouseEntity>(`/warehouses/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
+  getWarehouseTransfers(warehouseId: string) { return this.request<WarehouseTransferItem[]>(`/warehouses/${encodeURIComponent(warehouseId)}/transfers`); }
+  getWarehouseShortages(warehouseId: string) { return this.request<ShortageItem[]>(`/warehouses/${encodeURIComponent(warehouseId)}/shortages`); }
+
+  // Products
+  getProducts() { return this.request<ProductItem[]>('/products'); }
+  createProduct(data: CreateProductPayload) { return this.request<ProductItem>('/products', { method: 'POST', body: JSON.stringify(data) }); }
+
+  // Inventory Slots, Dock Receipts, Shortages & Movements
+  createInventorySlot(data: CreateInventorySlotPayload) { return this.request<WarehouseInventory>('/inventory', { method: 'POST', body: JSON.stringify(data) }); }
+  recordStockReceipt(data: RecordStockReceiptPayload) { return this.request<WarehouseInventory>('/inventory/receipt', { method: 'POST', body: JSON.stringify(data) }); }
+  getAllShortages() { return this.request<ShortageItem[]>('/inventory/shortages'); }
+  getAllStockMovements(warehouseId?: string, sku?: string) {
+    const params = new URLSearchParams();
+    if (warehouseId) params.set('warehouse_id', warehouseId);
+    if (sku) params.set('sku', sku);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<StockMovementItem[]>(`/inventory/movements${query}`);
+  }
+
+  // Stock Transfer Workflow Lifecycle (REQUESTED -> APPROVED -> IN_TRANSIT -> RECEIVED)
+  getAllTransfers(warehouseId?: string, status?: string) {
+    const params = new URLSearchParams();
+    if (warehouseId) params.set('warehouse_id', warehouseId);
+    if (status) params.set('status', status);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.request<WarehouseTransferItem[]>(`/inventory/transfers${query}`);
+  }
+  getTransfer(id: string) { return this.request<WarehouseTransferItem>(`/inventory/transfers/${encodeURIComponent(id)}`); }
+  requestTransfer(data: TransferRequestPayload) { return this.request<WarehouseTransferItem>('/inventory/transfers/request', { method: 'POST', body: JSON.stringify(data) }); }
+  approveTransfer(id: string, comments = '') { return this.request<WarehouseTransferItem>(`/inventory/transfers/${encodeURIComponent(id)}/approve`, { method: 'POST', body: JSON.stringify({ comments }) }); }
+  dispatchTransfer(id: string, notes = '') { return this.request<WarehouseTransferItem>(`/inventory/transfers/${encodeURIComponent(id)}/dispatch`, { method: 'POST', body: JSON.stringify({ notes }) }); }
+  receiveTransfer(id: string, notes = '') { return this.request<WarehouseTransferItem>(`/inventory/transfers/${encodeURIComponent(id)}/receive`, { method: 'POST', body: JSON.stringify({ notes }) }); }
+  cancelTransfer(id: string, reason = '') { return this.request<WarehouseTransferItem>(`/inventory/transfers/${encodeURIComponent(id)}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) }); }
 }
 
 export const api = new FastApiClient();

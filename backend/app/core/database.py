@@ -91,6 +91,60 @@ def init_database() -> None:
                     connection.execute(text(f"ALTER TABLE recovery_plans ADD COLUMN {col} {col_type}"))
                     connection.commit()
 
+            # Enterprise warehouse & multi-facility migrations
+            existing_tables = set(inspector.get_table_names())
+            if "warehouses" in existing_tables:
+                wh_cols = {c["name"] for c in inspector.get_columns("warehouses")}
+                for col, col_def in [
+                    ("company_id", "VARCHAR(32)"),
+                    ("is_demo", "BOOLEAN DEFAULT 0"),
+                    ("manager_name", "VARCHAR(128)"),
+                    ("contact_email", "VARCHAR(128)"),
+                    ("max_pallet_capacity", "INTEGER DEFAULT 10000"),
+                    ("current_utilization_pct", "NUMERIC(5, 2) DEFAULT 0.0"),
+                ]:
+                    if col not in wh_cols:
+                        connection.execute(text(f"ALTER TABLE warehouses ADD COLUMN {col} {col_def}"))
+                        connection.commit()
+
+            if "suppliers" in existing_tables:
+                sup_cols = {c["name"] for c in inspector.get_columns("suppliers")}
+                for col, col_def in [("company_id", "VARCHAR(32)"), ("is_demo", "BOOLEAN DEFAULT 0")]:
+                    if col not in sup_cols:
+                        connection.execute(text(f"ALTER TABLE suppliers ADD COLUMN {col} {col_def}"))
+                        connection.commit()
+
+            if "inventory" in existing_tables:
+                inv_cols = {c["name"] for c in inspector.get_columns("inventory")}
+                if "is_demo" not in inv_cols:
+                    connection.execute(text("ALTER TABLE inventory ADD COLUMN is_demo BOOLEAN DEFAULT 0"))
+                    connection.commit()
+
+            if "shipments" in existing_tables:
+                shp_cols = {c["name"] for c in inspector.get_columns("shipments")}
+                for col, col_def in [("destination_warehouse_id", "VARCHAR(32)"), ("is_demo", "BOOLEAN DEFAULT 0")]:
+                    if col not in shp_cols:
+                        connection.execute(text(f"ALTER TABLE shipments ADD COLUMN {col} {col_def}"))
+                        connection.commit()
+
+            if "orders" in existing_tables:
+                ord_cols = {c["name"] for c in inspector.get_columns("orders")}
+                if "is_demo" not in ord_cols:
+                    connection.execute(text("ALTER TABLE orders ADD COLUMN is_demo BOOLEAN DEFAULT 0"))
+                    connection.commit()
+
+            if "order_lines" in existing_tables:
+                ol_cols = {c["name"] for c in inspector.get_columns("order_lines")}
+                if "is_demo" not in ol_cols:
+                    connection.execute(text("ALTER TABLE order_lines ADD COLUMN is_demo BOOLEAN DEFAULT 0"))
+                    connection.commit()
+
+            if "users" in existing_tables:
+                usr_cols = {c["name"] for c in inspector.get_columns("users")}
+                if "assigned_warehouse_id" not in usr_cols:
+                    connection.execute(text("ALTER TABLE users ADD COLUMN assigned_warehouse_id VARCHAR(32)"))
+                    connection.commit()
+
 
 if __name__ == "__main__":
     init_database()
